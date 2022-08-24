@@ -1,0 +1,24 @@
+name: test
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'standalone-*'
+      - 'pom.xml'
+      - 'web/**'
+      - 'rules/**'
+      - 'schema/**'
+      - '.github/workflows/test.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: test
+        run: mvn test
