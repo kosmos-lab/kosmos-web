@@ -1,0 +1,256 @@
+<!doctype html> <!-- Important: must specify -->
+<html>
+<head>
+    <meta charset="utf-8"> <!-- Important: rapi-doc uses utf8 charecters -->
+    <script type="module" src="rapidoc-min.js"></script>
+    <style>
+        #btns {
+
+            top: 0;
+            right: 0;
+            background-color: var(--nav-bg-color);
+            color: var(--nav-text-color);
+        }
+
+        .login-input {
+            padding-right: 20px;
+            color: var(--nav-hover-text-color);
+            border-color: var(--nav-accent-color);
+            background-color: var(--nav-hover-bg-color);
+        }
+
+        .m-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--primary-color-invert);
+        }
+
+        .m-btn.primary {
+            background-color: var(--primary-color);
+            color: var(--primary-color-invert);
+        }
+
+        .m-btn {
+            border-radius: var(--border-radius);
+            box-sizing: border-box;
+            font-weight: 600;
+            display: inline-block;
+            padding: 6px 16px;
+            font-size: var(--font-size-small);
+            outline: 0px;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            border: 2px solid var(--primary-color);
+            background-color: transparent;
+            transition: background-color 0.2s ease 0s;
+            user-select: none;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        input, textarea, select, button, pre {
+            color: var(--fg);
+            outline: none;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+
+        rapi-doc {
+            width: 100%;
+        }
+    </style>
+    <script>
+        let logins = {}
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+
+            //check if localstorage has already saved credentials
+            const storage = localStorage.getItem('logins');
+            if (storage != undefined) {
+                //if localstorage was not empty parse it as json
+                logins = JSON.parse(storage);
+
+                const div = document.getElementById("logindiv");
+
+                //add all of the buttons to quickly login
+                for (const [key, value] of Object.entries(logins)) {
+                    const btn = document.createElement("button");
+                    btn.addEventListener("click", function (event) {
+                        getToken(key, value);
+
+                    });
+                    btn.classList.add("m-btn");
+                    btn.classList.add("primary");
+                    btn.innerText = `login ${key}`;
+                    div.appendChild(btn);
+                }
+            }
+
+            //add keydown eventlistener to send login on enter
+            document.querySelector("#user").addEventListener("keydown", (evt) => {
+                if (evt.key === "Enter") {
+                    login();
+                }
+            });
+            //add keydown eventlistener to send login on enter
+            document.querySelector("#pass").addEventListener("keydown", (evt) => {
+                if (evt.key === "Enter") {
+                    login();
+                }
+            });
+
+            let docEl = document.getElementById('thedoc');
+            if (docEl == undefined) {
+                docEl = document.getElementsByTagName("rapi-doc")[0];
+            }
+            docEl.addEventListener('before-render',(e) => {
+                console.log(e);
+                let myurl = undefined;
+                const queryString = window.location.search;
+                if (queryString) {
+                    const urlParams = new URLSearchParams(queryString);
+                    myurl = urlParams.get('host')
+                }
+                if (myurl == undefined) {
+                    myurl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+                }
+                console.log(e.detail.servers);
+                e.detail.spec.servers[0].url = myurl;
+                e.detail.spec.servers[0].computedUrl = myurl;
+            });
+
+        });
+
+
+        function handleKey(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        }
+
+        function login() {
+            const u = document.getElementById('user');
+            const p = document.getElementById('pass');
+            const s = document.getElementById('save').checked;
+            getToken(u.value, p.value, s);
+        }
+
+        function getToken(user, pass, save) {
+            let server = "";
+            let docEl = document.getElementById('thedoc');
+            if (docEl == undefined) {
+                docEl = document.getElementsByTagName("rapi-doc")[0];
+            }
+            //kind of a dirty hack - but it works
+            //iterate all servers and get the currently selected one
+            docEl.shadowRoot.getElementById("servers").querySelectorAll('input').forEach(function (node) {
+//                console.log("found node ", node);
+                if (node.checked) {
+                    server = node.value;
+                    console.log("found server " + server);
+                }
+
+            })
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", `${server}/user/login`, true);
+
+            //Send the proper header information along with the request
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            /*xhr.onreadystatechange = function () { // Call a function when the state changes.
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+
+                    // Request finished. Do processing here.
+                }
+            }*/
+            xhr.onload = function () {
+                if (xhr.readyState === xhr.DONE) {
+                    if (xhr.status === 200) {
+                        //login was successful
+
+                        //should it be saved to local storage?
+                        if (save) {
+                            logins[user] = pass;
+                            localStorage.setItem('logins', JSON.stringify(logins));
+                        }
+
+                        //extract token
+                        let token = xhr.responseText;
+
+                        //get the element we need for rapidoc to inject credentials
+                        let docEl = document.getElementById('thedoc');
+                        if (docEl == undefined) {
+
+                            docEl = document.getElementsByTagName("rapi-doc")[0];
+                        }
+                        //inject the attributes to rapidoc
+                        console.log(docEl);
+                        docEl.setAttribute('api-key-value', 'Bearer ' + token);
+
+                        docEl.setAttribute('api-key-name', 'Authorization');
+                        docEl.setAttribute('api-key-location', 'header');
+
+
+                    }
+                }
+            };
+
+            //send the login
+            xhr.send(`user=${user}&pass=${pass}`);
+
+        }
+    </script>
+</head>
+<body>
+
+
+<rapi-doc
+        spec-url="openapi.yaml"
+        regular-font="Open Sans"
+        mono-font="Roboto Mono"
+        bg-color="#f9f9fa"
+        text-color=""
+        nav-bg-color="#3f4d67"
+        nav-text-color="#a9b7d0"
+        nav-hover-bg-color="#333f54"
+        nav-hover-text-color="#fff"
+        nav-accent-color="#f44236"
+        primary-color="#5c7096"
+        theme="light"
+        sort-tags="true"
+        show-components="false"
+        show-header="false"
+        render-style="read"
+        schema-style="tree"
+        show-info="true"
+        use-path-in-nav-bar="true"
+        show-method-in-nav-bar="as-colored-block"
+        allow-server-selection="true"
+        api-key-name="Authorization"
+        api-key-location="header"
+        api-key-value=""
+
+        server-url=" ">
+    <!--
+    below html is custom html that adds an input field and a button in header
+    on clicking the button the 'api-key-value' is set to the value in input box
+    -->
+    <div id="btns">
+        <div id="logindiv">
+
+        </div>
+
+        <input type="text" class="login-input" id="user" name="name" placeholder="username">
+        <input type="password" class="login-input" id="pass" name="pass" placeholder="password">
+        <input type="checkbox" class="login-input" id="save" name="save" checked>
+        <label for="save">save to localstorage</label>
+        <button class="m-btn primary" onclick='login()'>login</button>
+
+    </div>
+</rapi-doc>
+
+
+</body>
+</html>

@@ -380,6 +380,7 @@ public abstract class WebServer {
 
 
     public void prepare() {
+        //force openApi to always be included
         this.findServlets(new String[]{"de.kosmos_lab.web.server.servlets.openapi"}, BaseServlet.class, null);
         int maxThreads = 10;
         int minThreads = 2;
