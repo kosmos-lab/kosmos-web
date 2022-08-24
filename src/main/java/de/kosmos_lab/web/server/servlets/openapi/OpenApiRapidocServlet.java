@@ -25,11 +25,11 @@ public class OpenApiRapidocServlet extends BaseServlet {
             throws IOException {
         if (cached == null) {
 
-            cached = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("/web/doc/rapidoc-min.js"), StandardCharsets.UTF_8);
+            cached = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("web/doc/rapidoc-min.js"), StandardCharsets.UTF_8);
 
 
         }
-        sendHTML(request, response, cached);
+        sendTextAs(request, response, cached,"application/javascript; charset=utf-8");
 
 
     }

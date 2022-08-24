@@ -302,6 +302,10 @@ public class BaseServlet extends HttpServlet {
         response.setHeader("Content-Type", "text/html");
         response.getWriter().print(text);
     }
+    public static void sendTextAs(BaseServletRequest req, HttpServletResponse response, String text,String type) throws IOException {
+        response.setHeader("Content-Type", type);
+        response.getWriter().print(text);
+    }
     public static void sendXML(BaseServletRequest req, HttpServletResponse response, String text) throws IOException {
         response.setHeader("Content-Type", "application/xml");
         response.getWriter().print(text);

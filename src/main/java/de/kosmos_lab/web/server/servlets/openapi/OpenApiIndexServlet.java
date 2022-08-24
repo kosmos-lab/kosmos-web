@@ -25,7 +25,7 @@ public class OpenApiIndexServlet extends BaseServlet {
             throws IOException {
         if (cached == null) {
 
-            cached = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("/web/doc/index.html"), StandardCharsets.UTF_8);
+            cached = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("web/doc/index.html"), StandardCharsets.UTF_8);
 
 
         }
