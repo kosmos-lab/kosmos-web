@@ -1,6 +1,10 @@
 # Changelog
 
 
+# v0.1.2
+* changed exception workflow a bit
+
+
 # v0.1.1
 * fixed an issue with /doc not loading the openapi.yaml
 
