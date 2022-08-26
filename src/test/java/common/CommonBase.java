@@ -255,7 +255,12 @@ public class CommonBase {
 
     @AfterSuite
     public void cleanup(ITestContext context) {
-        //Thread.sleep(6000000000l);
+        //just for testing
+        /*try {
+            Thread.sleep(6000000000l);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }*/
 
 
         /*

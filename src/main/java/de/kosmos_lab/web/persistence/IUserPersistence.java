@@ -1,9 +1,8 @@
 package de.kosmos_lab.web.persistence;
 
-import de.kosmos_lab.web.persistence.exceptions.AlreadyExistsException;
-import de.kosmos_lab.web.persistence.exceptions.NotFoundInPersistenceException;
 import de.kosmos_lab.web.data.User;
 import de.kosmos_lab.web.exceptions.LoginFailedException;
+import de.kosmos_lab.web.persistence.exceptions.NotFoundInPersistenceException;
 import org.json.JSONObject;
 
 import javax.annotation.CheckForNull;

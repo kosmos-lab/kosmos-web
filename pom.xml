@@ -330,6 +330,11 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.1.22.Final</version>
+        </dependency>
     </dependencies>
     <build>
 

@@ -1,11 +1,11 @@
 package de.kosmos_lab.web.persistence;
 
 
-import de.kosmos_lab.web.server.JWT;
-import de.kosmos_lab.web.data.User;
-import de.kosmos_lab.web.exceptions.LoginFailedException;
 import de.kosmos_lab.utils.FileUtils;
 import de.kosmos_lab.utils.StringFunctions;
+import de.kosmos_lab.web.data.User;
+import de.kosmos_lab.web.exceptions.LoginFailedException;
+import de.kosmos_lab.web.server.JWT;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

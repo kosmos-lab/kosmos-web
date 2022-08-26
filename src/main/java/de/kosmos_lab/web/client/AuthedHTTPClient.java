@@ -1,11 +1,5 @@
 package de.kosmos_lab.web.client;
 
-import de.kosmos_lab.web.client.exceptions.LoginFailedException;
-import de.kosmos_lab.web.client.exceptions.NotFoundException;
-import de.kosmos_lab.web.client.exceptions.RequestConflictException;
-import de.kosmos_lab.web.client.exceptions.RequestFailedException;
-import de.kosmos_lab.web.client.exceptions.RequestNoAccessException;
-import de.kosmos_lab.web.client.exceptions.RequestWrongStatusExeption;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;

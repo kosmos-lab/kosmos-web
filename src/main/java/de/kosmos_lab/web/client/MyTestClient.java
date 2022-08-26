@@ -1,8 +1,6 @@
 package de.kosmos_lab.web.client;
 
 
-import de.kosmos_lab.web.client.exceptions.LoginFailedException;
-import de.kosmos_lab.web.client.exceptions.RequestFailedException;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.http.HttpMethod;

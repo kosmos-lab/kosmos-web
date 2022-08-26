@@ -5,6 +5,7 @@ import de.kosmos_lab.web.server.servlets.BaseServlet;
 import de.kosmos_lab.web.server.servlets.BaseServletRequest;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/online"}, loadOnStartup = 1)

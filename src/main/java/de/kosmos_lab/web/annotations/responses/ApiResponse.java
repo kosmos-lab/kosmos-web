@@ -1,14 +1,11 @@
 package de.kosmos_lab.web.annotations.responses;
 
 
-
-
 import de.kosmos_lab.web.annotations.extensions.Extension;
 import de.kosmos_lab.web.annotations.headers.Header;
 import de.kosmos_lab.web.annotations.links.Link;
 import de.kosmos_lab.web.annotations.media.Content;
 import de.kosmos_lab.web.doc.openapi.ResponseCode;
-
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

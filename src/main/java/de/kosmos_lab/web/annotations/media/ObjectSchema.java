@@ -23,4 +23,6 @@ public @interface ObjectSchema {
 
 
     Extension[] extensions() default {};
+    ExampleObject[] examples() default {};
+
 }

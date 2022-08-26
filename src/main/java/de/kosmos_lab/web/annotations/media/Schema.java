@@ -1,8 +1,8 @@
 package de.kosmos_lab.web.annotations.media;
 
+import de.kosmos_lab.web.annotations.ExternalDocumentation;
 import de.kosmos_lab.web.annotations.enums.SchemaType;
 import de.kosmos_lab.web.annotations.extensions.Extension;
-import de.kosmos_lab.web.annotations.ExternalDocumentation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

@@ -4,6 +4,7 @@ import de.kosmos_lab.web.annotations.Operation;
 import de.kosmos_lab.web.annotations.responses.ApiResponse;
 import de.kosmos_lab.web.doc.openapi.ApiEndpoint;
 import de.kosmos_lab.web.doc.openapi.ResponseCode;
+import de.kosmos_lab.web.server.AsyncApiParser;
 import de.kosmos_lab.web.server.OpenApiParser;
 import de.kosmos_lab.web.server.WebServer;
 import de.kosmos_lab.web.server.servlets.BaseServlet;
@@ -13,25 +14,25 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-@ApiEndpoint(path = "/doc/openapi.yaml", userLevel = -1)
-public class OpenApiServlet extends BaseServlet {
-    static OpenApiParser parser = null;
+@ApiEndpoint(path = "/doc/asyncapi.yaml", userLevel = -1)
+public class AsyncApiServlet extends BaseServlet {
+    static AsyncApiParser parser = null;
     public String cached = null;
 
-    public OpenApiServlet(WebServer webServer) {
+    public AsyncApiServlet(WebServer webServer) {
         super(webServer);
         if (parser == null) {
-            parser = new OpenApiParser(webServer);
+            parser = new AsyncApiParser(webServer);
         }
 
     }
 
     @Operation(
-            tags = {"OpenApi"},
-            summary = "openapi.yaml",
-            description = "The generated openApi specification for this service in YAML format",
+            tags = {"asyncApi"},
+            summary = "asyncapi.yaml",
+            description = "The generated asyncApi specification for this service in YAML format",
             responses = {
-                    @ApiResponse(responseCode = @ResponseCode(statusCode = de.kosmos_lab.web.server.WebServer.STATUS_OK), description = "The generated openApi specification for this service"),
+                    @ApiResponse(responseCode = @ResponseCode(statusCode = WebServer.STATUS_OK), description = "The generated asyncApi specification for this service"),
             }
     )
     @Override

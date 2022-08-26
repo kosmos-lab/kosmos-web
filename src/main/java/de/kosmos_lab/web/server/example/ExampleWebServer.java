@@ -2,7 +2,15 @@ package de.kosmos_lab.web.server.example;
 
 import de.kosmos_lab.utils.HashFunctions;
 import de.kosmos_lab.utils.StringFunctions;
+import de.kosmos_lab.web.annotations.enums.SecurityIn;
+import de.kosmos_lab.web.annotations.enums.SecurityType;
+import de.kosmos_lab.web.annotations.info.AsyncInfo;
+import de.kosmos_lab.web.annotations.info.Contact;
+import de.kosmos_lab.web.annotations.info.Info;
+import de.kosmos_lab.web.annotations.info.License;
+import de.kosmos_lab.web.annotations.security.SecuritySchema;
 import de.kosmos_lab.web.doc.openapi.ApiEndpoint;
+import de.kosmos_lab.web.doc.openapi.WebSocketEndpoint;
 import de.kosmos_lab.web.persistence.ControllerWithPersistence;
 import de.kosmos_lab.web.persistence.IPersistence;
 import de.kosmos_lab.web.persistence.ISesssionPersistence;
@@ -13,8 +21,8 @@ import de.kosmos_lab.web.server.WebServer;
 import de.kosmos_lab.web.server.WebSocketService;
 import de.kosmos_lab.web.server.example.servlets.session.KillServlet;
 import de.kosmos_lab.web.server.example.servlets.session.MyServlet;
+import de.kosmos_lab.web.server.example.servlets.user.AdminViewServlet;
 import de.kosmos_lab.web.server.example.servlets.user.LoginServlet;
-import de.kosmos_lab.web.server.example.servlets.user.UserViewServlet;
 import jakarta.servlet.http.HttpServlet;
 import org.json.JSONObject;
 import org.reflections.Reflections;
@@ -27,6 +35,48 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+@SecuritySchema(
+        componentName = "bearerAuth",
+
+        description = "contains a JSON Web Tokens (JWT) obtainable from #post-/user/login",
+        type = SecurityType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer"
+)
+@SecuritySchema(
+        componentName = "basicAuth",
+        description = "basic auth is also allowed for all requests",
+        type = SecurityType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "basic"
+)
+@SecuritySchema(
+        componentName = "secret",
+        name = "token",
+        description = "Contains a secret known to both parties",
+        type = SecurityType.APIKEY,
+        in = SecurityIn.QUERY
+)
+@Info(
+        description = "# WebExample Synchron HTTP API \n" +
+                "### [Asyncron WS/MQTT Documentation](async.html) \n" +
+                "This is an example openApi specification \n" +
+                "Please make sure you are logged in if you want to try to execute any request to the server.\n" +
+                "You can simply login with the form injected to the top of the page.\n" +
+                "(Almost) all POST requests with simple a datatype for parameters can be used either with parameters in query or a JSONObject in the request body. Exceptions are more complex datatypes like JSONObjects themselves (for example for /schema/add).",
+        title = "Example OpenAPI",
+        version = "filled-by-code",
+        license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"),
+        contact = @Contact(name = "Jan Janssen", email = "Jan.Janssen@dfki.de")
+)
+@AsyncInfo(
+        description = "# WebExample ASynchron HTTP API",
+        title = "Example OpenAPI",
+        version = "filled-by-code",
+        license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"),
+        contact = @Contact(name = "Jan Janssen", email = "Jan.Janssen@dfki.de")
+)
 
 public class ExampleWebServer extends WebServer implements ControllerWithPersistence {
 
@@ -44,6 +94,7 @@ public class ExampleWebServer extends WebServer implements ControllerWithPersist
         this.persistences = new ConcurrentHashMap<>();
         prepare();
         start();
+
 
     }
 
@@ -273,14 +324,29 @@ public class ExampleWebServer extends WebServer implements ControllerWithPersist
         }
     }
 
+    public WebSocketService create(Class<? extends WebSocketService> service, WebSocketEndpoint api) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+
+        try {
+            return service.getConstructor(ExampleWebServer.class).newInstance(this);
+
+        } catch (NoSuchMethodException e) {
+
+            return service.getConstructor(WebServer.class).newInstance(this);
+
+
+        }
+        
+    }
+
 
     public void findServlets(String[] namespaces, Class<? extends HttpServlet> baseServletClass, Class<? extends WebSocketService> baseSocketClass) {
         super.findServlets(namespaces, baseServletClass, baseSocketClass);
         //manually add those back to the wanted servlets
         this.servlets.add(LoginServlet.class);
-        this.servlets.add(UserViewServlet.class);
+        this.servlets.add(AdminViewServlet.class);
         this.servlets.add(KillServlet.class);
         this.servlets.add(MyServlet.class);
+        this.wsservices.add(MyWebSocketService.class);
     }
 
 

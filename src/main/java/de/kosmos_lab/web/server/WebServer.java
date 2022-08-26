@@ -6,13 +6,12 @@ import de.kosmos_lab.utils.StringFunctions;
 import de.kosmos_lab.web.annotations.responses.ApiResponse;
 import de.kosmos_lab.web.doc.openapi.ApiEndpoint;
 import de.kosmos_lab.web.doc.openapi.ApiResponseDescription;
+import de.kosmos_lab.web.doc.openapi.WebSocketEndpoint;
 import de.kosmos_lab.web.server.servlets.BaseServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.websocket.server.ServerEndpoint;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -69,7 +68,7 @@ public abstract class WebServer {
     protected Server server;
     protected int port;
     protected Set<Class<? extends HttpServlet>> servlets = new HashSet<>();
-    protected HashSet<Class<? extends WebSocketService>> wsservices = new HashSet<>();
+    protected Set<Class<? extends WebSocketService>> wsservices = new HashSet<>();
     protected HashSet<String> wssclasses = new HashSet<>();
     protected HashSet<String> servclasses = new HashSet<>();
     protected HashSet<String> paths = new HashSet<>();
@@ -102,6 +101,7 @@ public abstract class WebServer {
 
 
     public abstract HttpServlet create(Class<? extends HttpServlet> servlet, ApiEndpoint api) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
+    public abstract WebSocketService create(Class<? extends WebSocketService> servlet, WebSocketEndpoint api) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
     public void createServlet(Class<? extends HttpServlet> servlet) {
         ApiEndpoint api = servlet.getAnnotation(ApiEndpoint.class);
@@ -112,7 +112,7 @@ public abstract class WebServer {
                     return;
                 }
                 //if (api.load()) { //we moved this check to findServlets, so we could add classes manually for testing etc
-                HttpServlet s = create(servlet,api);
+                HttpServlet s = create(servlet, api);
 
 
                 context.addServlet(new ServletHolder(s), api.path());
@@ -165,7 +165,7 @@ public abstract class WebServer {
         handlers.addHandler(context);
 
         server.setHandler(handlers);
-        OpenApiParser.create(this.loadedServlets);
+        //OpenApiParser.create(this.loadedServlets);
 
         server.start();
         //server.dump(System.err);
@@ -173,9 +173,34 @@ public abstract class WebServer {
     }
 
     public void createWebSocketService(Class<? extends WebSocketService> c) {
-        ServerEndpoint endpoint = c.getAnnotation(ServerEndpoint.class);
+        WebSocketEndpoint endpoint = c.getAnnotation(WebSocketEndpoint.class);
         if (endpoint != null) {
-            logger.info("found: WebSocketService: {} endpoint {}", c.getName(), endpoint.value());
+            logger.info("found: WebSocketService: {} endpoint {}", c.getName(), endpoint.path());
+            try {
+                WebSocketService service = create(c,endpoint);
+                JettyWebSocketServlet websocketServlet = new JettyWebSocketServlet() {
+                    @Override
+                    protected void configure(JettyWebSocketServletFactory factory) {
+                        factory.setIdleTimeout(Duration.ofSeconds(60));
+                        factory.setCreator(new WebSocketCreator(service, null));
+                    }
+                };
+
+                context.addServlet(new ServletHolder(websocketServlet), endpoint.path());
+
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        ServerEndpoint serverEndpoint = c.getAnnotation(ServerEndpoint.class);
+        if (serverEndpoint != null) {
+            logger.info("found: WebSocketService: {} endpoint {}", c.getName(), serverEndpoint.value());
             try {
                 WebSocketService service = c.getConstructor(WebServer.class).newInstance(this);
                 JettyWebSocketServlet websocketServlet = new JettyWebSocketServlet() {
@@ -186,7 +211,7 @@ public abstract class WebServer {
                     }
                 };
 
-                context.addServlet(new ServletHolder(websocketServlet), endpoint.value());
+                context.addServlet(new ServletHolder(websocketServlet), serverEndpoint.value());
 
             } catch (InstantiationException e) {
                 e.printStackTrace();
@@ -311,6 +336,26 @@ public abstract class WebServer {
 
                     }
                 }
+                try {
+
+                    for (Class c : r.getTypesAnnotatedWith(WebSocketEndpoint.class)) {
+                        if (baseSocketClass.isAssignableFrom(c)) {
+                            if (!wsservices.contains(c)) {
+                                if (!wssclasses.contains(c.getName())) {
+                                    WebSocketEndpoint endpoint = (WebSocketEndpoint) c.getAnnotation(WebSocketEndpoint.class);
+                                    if (endpoint != null && endpoint.load()) {
+                                        wssclasses.add(c.getName());
+                                        logger.info("Annotations ({}) found WebSocketService: {}", WebSocketEndpoint.class.getName(), c.getName());
+                                        wsservices.add(c);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (org.reflections.ReflectionsException ex) {
+
+                }
+
             }
 
 
@@ -401,6 +446,7 @@ public abstract class WebServer {
 
 
     public void prepare() {
+        //OpenApiParser.serverClass = this.getClass();
         //force openApi to always be included
         this.findServlets(new String[]{"de.kosmos_lab.web.server.servlets.openapi"}, BaseServlet.class, null);
         int maxThreads = 10;
@@ -442,5 +488,8 @@ public abstract class WebServer {
 
     protected void setConfigFile(File configFile) {
         this.configFile = configFile;
+    }
+    protected Set<Class<? extends WebSocketService>> getWebSocketServices() {
+        return this.wsservices;
     }
 }

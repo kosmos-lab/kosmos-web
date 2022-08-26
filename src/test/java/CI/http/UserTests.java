@@ -19,14 +19,14 @@ public class UserTests {
     }
 
     @Test
-    public void testUserView() {
-        ContentResponse response = CommonBase.clientAdmin.getResponse("/user/view", HttpMethod.GET);
+    public void testIsAdmin() {
+        ContentResponse response = CommonBase.clientAdmin.getResponse("/user/isAdmin", HttpMethod.GET);
         Assert.assertNotNull(response, "response should not have been null");
         Assert.assertEquals( response.getStatus(),WebServer.STATUS_OK, "admin should have been able to see this");
-        response = CommonBase.clientUser.getResponse("/user/view", HttpMethod.GET);
+        response = CommonBase.clientUser.getResponse("/user/isAdmin", HttpMethod.GET);
         Assert.assertNotNull(response, "response should not have been null");
         Assert.assertEquals(response.getStatus(),WebServer.STATUS_FORBIDDEN, "user should not be able to see this");
-        response = CommonBase.clientFakeUser.getResponse("/user/view", HttpMethod.GET);
+        response = CommonBase.clientFakeUser.getResponse("/user/isAdmin", HttpMethod.GET);
         Assert.assertNull(response, "response should have been null for fake user");
         //Assert.assertEquals(WebServer.STATUS_FORBIDDEN,response.getStatus());
     }

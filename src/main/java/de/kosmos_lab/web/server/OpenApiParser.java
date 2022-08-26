@@ -11,6 +11,7 @@ import de.kosmos_lab.web.annotations.Parameter;
 import de.kosmos_lab.web.annotations.enums.Explode;
 import de.kosmos_lab.web.annotations.enums.SchemaType;
 import de.kosmos_lab.web.annotations.headers.Header;
+import de.kosmos_lab.web.annotations.info.AsyncInfo;
 import de.kosmos_lab.web.annotations.info.Contact;
 import de.kosmos_lab.web.annotations.info.Info;
 import de.kosmos_lab.web.annotations.info.License;
@@ -51,30 +52,46 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class OpenApiParser {
-    public static final HashSet<String> missingFromResource = new HashSet<>();
-    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger("OpenApiParser");
-    private static final String formatRegex = "%\\{(?<key>.*?)\\}";
-    private static final Pattern formatPattern = Pattern.compile(".*?(" + formatRegex + ").*+");
-    public static Class<? extends WebServer> serverClass = WebServer.class;
-    static HashSet<Class<? extends HttpServlet>> servlets = new HashSet<>();
-    private static JSONObject json = null;
-    private static HashSet<Schema> schemas = new HashSet<>();
-    private static HashSet<ObjectSchema> oschemas = new HashSet<>();
-    private static HashSet<ArraySchema> aschemas = new HashSet<>();
-    private static HashSet<Parameter> parameters = new HashSet<>();
-    private static HashSet<Tag> tags = new HashSet<>();
-    private static ResourceBundle labels = null;
-    private static HashMap<String, JSONObject> mResponses = new HashMap<>();
-    private static JSONObject components;
-    private static LinkedList<Example> examples = new LinkedList<>();
-    private static JSONObject responses = new JSONObject();
+    private static OpenApiParser instance = null;
+    public final HashSet<String> missingFromResource = new HashSet<>();
+    protected final org.slf4j.Logger logger = LoggerFactory.getLogger("OpenApiParser");
+    protected final WebServer server;
+    private final String formatRegex = "%\\{(?<key>.*?)\\}";
+    private final Pattern formatPattern = Pattern.compile(".*?(" + formatRegex + ").*+");
+    private JSONObject json = null;
+    private HashSet<Schema> schemas = new HashSet<>();
+    private HashSet<ObjectSchema> oschemas = new HashSet<>();
+    private HashSet<ArraySchema> aschemas = new HashSet<>();
+    private HashSet<Parameter> parameters = new HashSet<>();
+    private HashSet<Tag> tags = new HashSet<>();
+    private ResourceBundle labels = null;
+    private HashMap<String, JSONObject> mResponses = new HashMap<>();
+    private JSONObject components;
+    private LinkedList<Example> examples = new LinkedList<>();
+    private JSONObject responses = new JSONObject();
 
-    public static String asYaml(String jsonString) throws JsonProcessingException, IOException {
+    public OpenApiParser(WebServer server) {
+        this.server = server;
+    }
+
+    public static OpenApiParser getInstance(WebServer server) {
+        if (instance == null) {
+            instance = new OpenApiParser(server);
+        }
+        return instance;
+    }
+
+    public Set<Class<? extends HttpServlet>> getServlets() {
+        return this.server.servlets;
+    }
+
+    public String asYaml(String jsonString) throws JsonProcessingException, IOException {
         // parse JSON
         JsonNode jsonNodeTree = new ObjectMapper().readTree(jsonString);
         // save it as YAML
@@ -83,22 +100,23 @@ public class OpenApiParser {
     }
 
 
-    public static String getYAML() throws IOException {
+    public String getYAML() throws IOException {
         return asYaml(getJSON().toString());
     }
 
-    public static void create(HashSet<Class<? extends HttpServlet>> pservlets) {
-        if (servlets == null) {
-            servlets = pservlets;
-        } else {
-            for (Class<? extends HttpServlet> servlet : pservlets) {
-                servlets.add(servlet);
-            }
-        }
 
+    public JSONObject toJSON(AsyncInfo info) {
+        JSONObject jinfo = new JSONObject();
+        add("description", info.description(), jinfo);
+        add("contact", info.contact(), jinfo);
+        add("termsOfService", info.termsOfService(), jinfo);
+        add("title", info.title(), jinfo);
+        add("version", info.version(), jinfo);
+        add("license", info.license(), jinfo);
+        return jinfo;
     }
 
-    public static JSONObject toJSON(Info info) {
+    public JSONObject toJSON(Info info) {
         JSONObject jinfo = new JSONObject();
         add("description", info.description(), jinfo);
         add("contact", info.contact(), jinfo);
@@ -112,14 +130,14 @@ public class OpenApiParser {
 
     }
 
-    public static void add(String tag, License license, JSONObject json) {
+    public void add(String tag, License license, JSONObject json) {
         JSONObject licenseJSON = new JSONObject();
         add("url", license.url(), licenseJSON);
         add("name", license.name(), licenseJSON);
         add(tag, licenseJSON, json);
     }
 
-    public static void add(String tag, Contact contact, JSONObject json) {
+    public void add(String tag, Contact contact, JSONObject json) {
         JSONObject contactJSON = new JSONObject();
         add("email", contact.email(), contactJSON);
         add("url", contact.url(), contactJSON);
@@ -127,7 +145,7 @@ public class OpenApiParser {
         add(tag, contactJSON, json);
     }
 
-    public static JSONObject getJSON() {
+    public synchronized JSONObject getJSON() {
         if (json != null) {
             return json;
         }
@@ -136,12 +154,10 @@ public class OpenApiParser {
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("org.reflections")).setLevel(Level.OFF);
         Reflections r = new Reflections("");
 
-        add("openapi", "3.0.0", json);
+        add("asyncapi", "2.4.0", json);
 
         JSONObject info = new JSONObject();
-
-
-        Info infoAnnotation = serverClass.getAnnotation(Info.class);
+        Info infoAnnotation = server.getClass().getAnnotation(Info.class);
         if (infoAnnotation != null) {
             info = toJSON(infoAnnotation);
         }
@@ -161,20 +177,20 @@ public class OpenApiParser {
 
         components = new JSONObject();
         JSONObject securitySchemes = new JSONObject();
-        for (Schema schema : serverClass.getAnnotationsByType(Schema.class)) {
+        for (Schema schema : server.getClass().getAnnotationsByType(Schema.class)) {
             String name = schema.name();
 
             if (name.length() > 0) {
                 schemas.add(schema);
             }
         }
-        for (ObjectSchema schema : serverClass.getAnnotationsByType(ObjectSchema.class)) {
+        for (ObjectSchema schema : server.getClass().getAnnotationsByType(ObjectSchema.class)) {
             String name = schema.componentName();
             if (name.length() > 0) {
                 oschemas.add(schema);
             }
         }
-        for (SecuritySchema schema : serverClass.getAnnotationsByType(SecuritySchema.class)) {
+        for (SecuritySchema schema : server.getClass().getAnnotationsByType(SecuritySchema.class)) {
             String name = schema.componentName();
             if (name.length() == 0) {
                 name = schema.name();
@@ -223,12 +239,15 @@ public class OpenApiParser {
             }
         }
         JSONArray servers = new JSONArray();
-        for (Server s : serverClass.getAnnotationsByType(Server.class)) {
+        for (Server s : server.getClass().getAnnotationsByType(Server.class)) {
             logger.info("found server {}", s);
             JSONObject j = new JSONObject();
             add("description", s.description(), j);
             add("url", s.url(), j);
             servers.put(j);
+        }
+        if (servers.length() == 0) {
+            servers.put(new JSONObject().put("url", "http://none").put("description", "current host"));
         }
 
         for (Class<?> c : r.getTypesAnnotatedWith(Server.class)) {
@@ -248,7 +267,7 @@ public class OpenApiParser {
 
 
         JSONObject paths = new JSONObject();
-        for (Class<? extends HttpServlet> c : servlets) {
+        for (Class<? extends HttpServlet> c : getServlets()) {
             ApiEndpoint a = c.getAnnotation(ApiEndpoint.class);
             if (a != null) {
                 if (!a.hidden()) {
@@ -262,7 +281,7 @@ public class OpenApiParser {
                                     Operation am = m.getAnnotation(Operation.class);
 
                                     if (am != null) {
-                                        OpenApiParser.add(a, am, m, paths);
+                                        add(a, am, m, paths);
                                     }
                                 }
 
@@ -294,7 +313,7 @@ public class OpenApiParser {
             add(s.name(), toJSON(s), schemajson);
         }
         for (ObjectSchema s : oschemas) {
-            add(s.componentName(), toJSON(s.properties()), schemajson);
+            add(s.componentName(), toJSON(s), schemajson);
         }
         for (Schema s : schemas) {
             add(s.name(), s, schemajson);
@@ -319,12 +338,26 @@ public class OpenApiParser {
         return json;
     }
 
+    public JSONObject toJSON(ObjectSchema p) {
+        JSONObject pjson = toJSON(p.properties());
+        JSONArray ex = new JSONArray();
+        for (ExampleObject e : p.examples()) {
+            ex.put(parseValue(e.value()));
+            //add("value", e.value(), json, true);
+
+
+        }
+        //add("examples", ex, pjson);
+        pjson.put("examples", ex);
+        return pjson;
+    }
+
     /**
      * used to check if the examples are all correct
      *
      * @return
      */
-    public static Tuple checkExamples() {
+    public Tuple checkExamples() {
         int failed = 0;
         int checked = 0;
         for (Example ex : examples) {
@@ -344,7 +377,7 @@ public class OpenApiParser {
 
     }
 
-    public static void add(String tag, OAuthFlows flows, JSONObject json) {
+    public void add(String tag, OAuthFlows flows, JSONObject json) {
         JSONObject flowsJSON = new JSONObject();
         add("implicit", flows.implicit(), flowsJSON);
         add("password", flows.password(), flowsJSON);
@@ -352,7 +385,7 @@ public class OpenApiParser {
         add("authorizationCode", flows.authorizationCode(), flowsJSON);
     }
 
-    public static void add(String tag, OAuthFlow flow, JSONObject json) {
+    public void add(String tag, OAuthFlow flow, JSONObject json) {
         JSONObject flowJSON = new JSONObject();
         add("authorizationUrl", flow.authorizationUrl(), flowJSON);
         add("tokenUrl", flow.tokenUrl(), flowJSON);
@@ -366,7 +399,7 @@ public class OpenApiParser {
 
     }
 
-    public static void add(Tag tag, JSONArray array) {
+    public void add(Tag tag, JSONArray array) {
         JSONObject j = new JSONObject();
         add("name", tag.name(), j);
         add("description", tag.description(), j);
@@ -377,7 +410,7 @@ public class OpenApiParser {
 
     }
 
-    public static void add(ApiEndpoint endpoint, Operation operation, Method method, JSONObject paths) {
+    public void add(ApiEndpoint endpoint, Operation operation, Method method, JSONObject paths) {
 
         JSONObject epp = paths.optJSONObject(endpoint.path());
         if (epp == null) {
@@ -499,7 +532,7 @@ public class OpenApiParser {
 
     }
 
-    private static JSONObject toJSON(ApiResponse response) {
+    private JSONObject toJSON(ApiResponse response) {
         JSONObject rjson = new JSONObject();
         add("description", response.description(), rjson);
         if (response.ref().length() > 0) {
@@ -517,7 +550,7 @@ public class OpenApiParser {
         return rjson;
     }
 
-    public static JSONObject toJSON(ArraySchema arraySchema) {
+    public JSONObject toJSON(ArraySchema arraySchema) {
         //logger.info("called toJSON(ArraySchema) with {}", arraySchema);
         //if (arraySchema.schema().type().length() > 0 || arraySchema.arraySchema().type().length() > 0 || arraySchema.schema().ref().length() > 0 || arraySchema.arraySchema().ref().length() > 0) {
         JSONObject schema = new JSONObject();
@@ -546,7 +579,7 @@ public class OpenApiParser {
         //return null;
     }
 
-    public static JSONObject createJSONSchemaFromSchema(JSONObject schema) {
+    public JSONObject createJSONSchemaFromSchema(JSONObject schema) {
         return new JSONObject().
                 put("components", new JSONObject().put("schemas", components.optJSONObject("schemas"))).
                 put("$schema", "http://json-schema.org/draft-07/schema#").
@@ -559,7 +592,7 @@ public class OpenApiParser {
 
     }
 
-    public static boolean checkExample(String value, JSONObject schema, SchemaType type) {
+    public boolean checkExample(String value, JSONObject schema, SchemaType type) {
         JSONObject v = null;
         try {
             org.everit.json.schema.Schema s = SchemaLoader.load(schema);
@@ -606,7 +639,7 @@ public class OpenApiParser {
 
     }
 
-    public static boolean checkExample(ExampleObject e, JSONObject schema, SchemaType type) {
+    public boolean checkExample(ExampleObject e, JSONObject schema, SchemaType type) {
         String value = e.value();
         if (e.value().length() == 0) {
             value = e.name();
@@ -615,7 +648,7 @@ public class OpenApiParser {
 
     }
 
-    public static JSONObject toJSON(Parameter p) {
+    public JSONObject toJSON(Parameter p) {
         JSONObject pjson = new JSONObject();
         if (p.ref().length() > 0) {
             add("$ref", p.ref(), pjson);
@@ -698,12 +731,12 @@ public class OpenApiParser {
         return pjson;
     }
 
-    public static void add(Parameter p, JSONArray params) {
+    public void add(Parameter p, JSONArray params) {
 
         params.put(toJSON(p));
     }
 
-    public static JSONObject toJSON(SchemaProperty[] properties) {
+    public JSONObject toJSON(SchemaProperty[] properties) {
         JSONObject schemajson = new JSONObject();
         schemajson.put("type", "object");
         JSONObject propjson = new JSONObject();
@@ -739,12 +772,12 @@ public class OpenApiParser {
 
     }
 
-    public static void add(String tag, SchemaProperty[] properties, JSONObject json) {
+    public void add(String tag, SchemaProperty[] properties, JSONObject json) {
 
         json.put(tag, toJSON(properties));
     }
 
-    public static void add(String tag, Content[] value, JSONObject json) {
+    public void add(String tag, Content[] value, JSONObject json) {
         if (value.length > 0) {
             JSONObject contentjson = new JSONObject();
             for (Content c : value) {
@@ -799,7 +832,7 @@ public class OpenApiParser {
 
     }
 
-    public static void add(String tag, Header[] value, JSONObject json) {
+    public void add(String tag, Header[] value, JSONObject json) {
         if (value.length > 0) {
             JSONObject contentjson = new JSONObject();
             for (Header c : value) {
@@ -830,7 +863,7 @@ public class OpenApiParser {
 
     }
 
-    public static JSONObject toJSON(ExampleObject example) {
+    public JSONObject toJSON(ExampleObject example) {
         JSONObject json = new JSONObject();
         if (example.ref().length() > 0) {
             add("$ref", example.ref(), json);
@@ -853,7 +886,7 @@ public class OpenApiParser {
         return json;
     }
 
-    public static void add(String tag, ExampleObject[] examples, JSONObject json) {
+    public void add(String tag, ExampleObject[] examples, JSONObject json) {
         JSONObject ex = new JSONObject();
         for (ExampleObject e : examples) {
             String name = e.name();
@@ -869,7 +902,7 @@ public class OpenApiParser {
         }
     }
 
-    public static JSONObject toJSON(Schema schema) {
+    public JSONObject toJSON(Schema schema) {
         JSONObject sjson = new JSONObject();
         if (schema.ref().length() > 0) {
             add("$ref", schema.ref(), sjson);
@@ -947,7 +980,11 @@ public class OpenApiParser {
 
             add("deprecated", schema.deprecated(), sjson, false);
             add("default", schema.defaultValue(), sjson);
-            add("enum", schema.allowableValues(), sjson);
+            if (schema.allowableValues().length > 1) {
+                add("enum", schema.allowableValues(), sjson);
+            } else if (schema.allowableValues().length == 1) {
+                add("const", schema.allowableValues()[0], sjson);
+            }
             add("externalDocs", schema.externalDocs(), sjson);
             add("discriminatorProperty", schema.discriminatorProperty(), sjson);
             add("DiscriminatorMapping", schema.discriminatorMapping(), sjson);
@@ -964,7 +1001,7 @@ public class OpenApiParser {
         return sjson;
     }
 
-    public static void add(String tag, Schema schema, JSONObject json) {
+    public void add(String tag, Schema schema, JSONObject json) {
         JSONObject sjson = toJSON(schema);
         if (sjson.length() > 0) {
             //only add the not optional things here so we always know if we need it
@@ -976,14 +1013,14 @@ public class OpenApiParser {
     }
 
     // TODO: 7/20/22 expand to correct values
-    public static void add(String tag, DiscriminatorMapping[] value, JSONObject json) {
+    public void add(String tag, DiscriminatorMapping[] value, JSONObject json) {
         if (value.length > 0) {
 
         }
     }
 
 
-    public static void add(String tag, ExternalDocumentation value, JSONObject json) {
+    public void add(String tag, ExternalDocumentation value, JSONObject json) {
         JSONObject j = new JSONObject();
         if (value.url().length() > 0) {
             j.put("url", value.url());
@@ -995,13 +1032,13 @@ public class OpenApiParser {
         }
     }
 
-    public static void add(String tag, double value, JSONObject json, Double ignoreIfThis) {
+    public void add(String tag, double value, JSONObject json, Double ignoreIfThis) {
         if (ignoreIfThis == null || ignoreIfThis != value) {
             json.put(tag, value);
         }
     }
 
-    public static void add(String tag, Class<?>[] clzlist, JSONObject json) {
+    public void add(String tag, Class<?>[] clzlist, JSONObject json) {
         JSONArray arr = new JSONArray();
         for (Class<?> clz : clzlist) {
             if (clz != Void.class) {
@@ -1013,39 +1050,39 @@ public class OpenApiParser {
         }
     }
 
-    public static void add(String tag, Class<?> clz, JSONObject json) {
+    public void add(String tag, Class<?> clz, JSONObject json) {
         if (clz != Void.class) {
             json.put(tag, clz.getName());
         }
     }
 
-    public static void add(String tag, boolean value, JSONObject json, Boolean ignoreIfThis) {
+    public void add(String tag, boolean value, JSONObject json, Boolean ignoreIfThis) {
         if (ignoreIfThis == null || ignoreIfThis != value) {
             json.put(tag, value);
         }
     }
 
-    public static void add(String tag, int value, JSONObject json, Integer ignoreIfThis) {
+    public void add(String tag, int value, JSONObject json, Integer ignoreIfThis) {
         if (ignoreIfThis == null || ignoreIfThis != value) {
             json.put(tag, value);
         }
     }
 
-    public static void add(String tag, JSONObject values, JSONObject json) {
+    public void add(String tag, JSONObject values, JSONObject json) {
         if (values != null && values.length() > 0) {
 
             json.put(tag, values);
         }
     }
 
-    public static void add(String tag, JSONArray values, JSONObject json) {
+    public void add(String tag, JSONArray values, JSONObject json) {
         if (values != null && values.length() > 0) {
 
             json.put(tag, values);
         }
     }
 
-    public static String getStringFromResource(String name) {
+    public String getStringFromResource(String name) {
         if (labels == null) {
             Locale locale = new Locale("en", "US");
 
@@ -1062,7 +1099,7 @@ public class OpenApiParser {
 
     }
 
-    public static String prepareString(String input) {
+    public String prepareString(String input) {
         @Deprecated
         Matcher m = formatPattern.matcher(input);
         while (m.matches()) {
@@ -1077,49 +1114,54 @@ public class OpenApiParser {
         return input.replace("\n", "  \n");
     }
 
-    public static void add(String tag, String value, JSONObject json) {
+    public void add(String tag, String value, JSONObject json) {
         if (value != null && value.length() > 0) {
             json.put(tag, prepareString(value));
         }
 
     }
 
-    public static void add(String tag, String value, JSONObject json, boolean parseValue) {
+    public Object parseValue(String value) {
+        if (value.equalsIgnoreCase("true")) {
+            return true;
+
+        }
+        if (value.equalsIgnoreCase("false")) {
+
+            return false;
+        }
+        if (value.startsWith("{")) {
+
+            try {
+                return new JSONObject(value);
+
+            } catch (Exception ex) {
+
+            }
+        }
+        if (value.startsWith("[")) {
+
+            try {
+                return new JSONArray(value);
+
+            } catch (Exception ex) {
+
+            }
+        }
+        return value;
+    }
+
+    public void add(String tag, String value, JSONObject json, boolean parseValue) {
         if (value != null && value.length() > 0) {
             if (parseValue) {
-                if (value.equalsIgnoreCase("true")) {
-                    json.put(tag, true);
-                    return;
-                }
-                if (value.equalsIgnoreCase("false")) {
-                    json.put(tag, false);
-                    return;
-                }
-                if (value.startsWith("{")) {
-
-                    try {
-                        json.put(tag, new JSONObject(value));
-                        return;
-                    } catch (Exception ex) {
-
-                    }
-                }
-                if (value.startsWith("[")) {
-
-                    try {
-                        json.put(tag, new JSONArray(value));
-                        return;
-                    } catch (Exception ex) {
-
-                    }
-                }
+                json.put(tag, parseValue(value));
             }
             json.put(tag, prepareString(value));
         }
 
     }
 
-    public static void add(String tag, String[] values, JSONObject json) {
+    public void add(String tag, String[] values, JSONObject json) {
         if (values != null && values.length > 0) {
             JSONArray arr = new JSONArray();
             for (String v : values) {

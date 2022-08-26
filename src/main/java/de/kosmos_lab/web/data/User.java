@@ -1,9 +1,9 @@
 package de.kosmos_lab.web.data;
 
+import de.kosmos_lab.utils.StringFunctions;
 import de.kosmos_lab.web.persistence.ControllerWithPersistence;
 import de.kosmos_lab.web.persistence.JSONPersistence;
 import de.kosmos_lab.web.persistence.JSONPersistenceObject;
-import de.kosmos_lab.utils.StringFunctions;
 import org.json.JSONObject;
 
 import java.util.UUID;
