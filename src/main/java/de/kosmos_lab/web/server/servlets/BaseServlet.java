@@ -19,6 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static de.kosmos_lab.web.server.WebServer.STATUS_FAILED;
 
@@ -26,11 +27,16 @@ import static de.kosmos_lab.web.server.WebServer.STATUS_FAILED;
 public class BaseServlet extends HttpServlet {
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger("KosmoSServlet");
     protected final WebServer server;
-
+protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
     ;
     final ALLOW_AUTH allow_auth;
 
-
+    /*public <T> T get(String key,Class<T> clazz) {
+        return (T) values.get(key);
+    }
+    public void set(String key, Object o) {
+        values.put(key,o);
+    }*/
     public BaseServlet(WebServer server) {
         this(server, ALLOW_AUTH.PARAMETER_AND_HEADER);
     }
@@ -269,7 +275,7 @@ public class BaseServlet extends HttpServlet {
 
     }
 
-    public void get(BaseServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void get(BaseServletRequest request, HttpServletResponse response) throws Exception {
         //logger.info("HITTING GET");
 
         response.setStatus(de.kosmos_lab.web.server.WebServer.STATUS_METHOD_NOT_ALLOWED);
@@ -286,12 +292,12 @@ public class BaseServlet extends HttpServlet {
 
     }
 
-    public void post(BaseServletRequest request, HttpServletResponse response) throws ServletException {
+    public void post(BaseServletRequest request, HttpServletResponse response) throws Exception {
         //logger.info("HITTING POST");
         response.setStatus(de.kosmos_lab.web.server.WebServer.STATUS_METHOD_NOT_ALLOWED);
     }
 
-    public void put(BaseServletRequest request, HttpServletResponse response) throws ServletException {
+    public void put(BaseServletRequest request, HttpServletResponse response) throws Exception {
         //logger.info("HITTING PUT");
         response.setStatus(de.kosmos_lab.web.server.WebServer.STATUS_METHOD_NOT_ALLOWED);
     }

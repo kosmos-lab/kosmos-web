@@ -1,4 +1,4 @@
-package de.kosmos_lab.web.server.servlets;
+package de.kosmos_lab.web.server.example;
 
 
 import de.kosmos_lab.web.persistence.exceptions.NoPersistenceException;
@@ -6,8 +6,8 @@ import de.kosmos_lab.web.exceptions.LoginFailedException;
 import de.kosmos_lab.web.exceptions.NotFoundException;
 import de.kosmos_lab.web.exceptions.ParameterNotFoundException;
 import de.kosmos_lab.web.exceptions.UnauthorizedException;
-import de.kosmos_lab.web.server.ExampleWebServer;
-import de.kosmos_lab.web.server.WebServer;
+import de.kosmos_lab.web.server.example.ExampleWebServer;
+import de.kosmos_lab.web.server.servlets.MyHttpServletRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

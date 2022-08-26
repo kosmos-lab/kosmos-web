@@ -100,13 +100,8 @@ public abstract class WebServer {
         // this(null, false);
     }
 
-    private static ContextHandler createContextHandler(String contextPath, Handler wrappedHandler) {
-        ContextHandler ch = new ContextHandler(contextPath);
-        ch.setHandler(wrappedHandler);
-        ch.clearAliasChecks();
-        ch.setAllowNullPathInfo(true);
-        return ch;
-    }
+
+    public abstract HttpServlet create(Class<? extends HttpServlet> servlet, ApiEndpoint api) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
     public void createServlet(Class<? extends HttpServlet> servlet) {
         ApiEndpoint api = servlet.getAnnotation(ApiEndpoint.class);
@@ -116,20 +111,16 @@ public abstract class WebServer {
                     logger.warn("did find path {} again?", api.path());
                     return;
                 }
-                if (api.load()) {
-                    HttpServlet s;
-                    if (api.userLevel() >= 0) {
-                        s = servlet.getConstructor(WebServer.class, int.class).newInstance(this, api.userLevel());
-                    } else {
-                        s = servlet.getConstructor(WebServer.class).newInstance(this);
-                    }
+                //if (api.load()) { //we moved this check to findServlets, so we could add classes manually for testing etc
+                HttpServlet s = create(servlet,api);
 
-                    context.addServlet(new ServletHolder(s), api.path());
-                    loadedServlets.add(servlet);
-                    paths.add(api.path());
-                    logger.info("registered web servlet {} ", s.getClass());
-                    return;
-                }
+
+                context.addServlet(new ServletHolder(s), api.path());
+                loadedServlets.add(servlet);
+                paths.add(api.path());
+                logger.info("registered web servlet {} ", s.getClass());
+                return;
+                //}
 
             } catch (InstantiationException e) {
                 e.printStackTrace();
@@ -219,6 +210,7 @@ public abstract class WebServer {
                     for (Class<? extends Exception> c : r.getSubTypesOf(Exception.class)) {
                         if (!thrown.contains(c)) {
                             if (c.getAnnotation(ApiResponse.class) != null) {
+
                                 logger.info("Reflections found Exception: {}", c.getName());
                                 thrown.add(c);
                             }
@@ -232,9 +224,21 @@ public abstract class WebServer {
                     for (Class<? extends HttpServlet> c : r.getSubTypesOf(baseServletClass)) {
                         if (!servlets.contains(c)) {
                             if (!servclasses.contains(c.getName())) {
-                                servclasses.add(c.getName());
-                                logger.info("Reflections found HttpServlet: {}", c.getName());
-                                servlets.add(c);
+                                ApiEndpoint endpoint = c.getAnnotation(ApiEndpoint.class);
+                                if (endpoint != null) {
+
+
+                                    servclasses.add(c.getName());
+                                    if (endpoint.load()) {
+                                        logger.info("Reflections found HttpServlet: {}", c.getName());
+
+                                        servlets.add(c);
+                                    } else {
+                                        logger.info("Reflections found HttpServlet, but it is marked with load=false {}", c.getName());
+                                    }
+                                } else {
+                                    logger.warn("Reflections found HttpServlet, but it had no @ApiEndpoint annotation!: {}", c.getName());
+                                }
                             }
                         }
                     }
@@ -248,9 +252,22 @@ public abstract class WebServer {
                             if (baseServletClass.isAssignableFrom(c)) {
                                 if (!servlets.contains(c)) {
                                     if (!servclasses.contains(c.getName())) {
-                                        servclasses.add(c.getName());
-                                        logger.info("Annotations ({}) found HttpServlet: {}", annotation.getName(), c.getName());
-                                        servlets.add(c);
+                                        if (annotation == ApiEndpoint.class) {
+                                            ApiEndpoint endpoint = (ApiEndpoint) c.getAnnotation(ApiEndpoint.class);
+                                            if (endpoint != null) { //can technically not happen, but its safer code
+                                                if (endpoint.load()) {
+                                                    logger.info("Reflections found HttpServlet: {}", c.getName());
+                                                    servlets.add(c);
+                                                } else {
+                                                    logger.info("Reflections found HttpServlet, but it is marked with load=false {}", c.getName());
+                                                }
+                                            }
+
+                                        } else {
+                                            servclasses.add(c.getName());
+                                            logger.info("Annotations ({}) found HttpServlet: {}", annotation.getName(), c.getName());
+                                            servlets.add(c);
+                                        }
                                     }
                                 }
                             }
@@ -304,7 +321,11 @@ public abstract class WebServer {
 
     public JSONObject readConfig() {
         JSONObject config = null;
+        if (configFile == null) {
+            logger.error("CONFIG FILE IS NULL!");
 
+            throw new RuntimeException("CONFIG FILE IS NULL!");
+        }
         if (!configFile.exists()) {
             if (!configFile.getParentFile().exists() && !configFile.getParentFile().mkdirs()) {
                 logger.error("COULD NOT CREATE PARENT DIRS:{}", configFile.getParentFile());
@@ -419,4 +440,7 @@ public abstract class WebServer {
     }
 
 
+    protected void setConfigFile(File configFile) {
+        this.configFile = configFile;
+    }
 }

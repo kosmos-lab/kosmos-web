@@ -23,200 +23,322 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 public abstract class AuthedHTTPClient extends HttpClient {
-    
-    
     private static final Logger logger = LoggerFactory.getLogger("AuthedHTTPClient");
+
     private final String base;
-    private int maxRetries = 3;
-    
+    private final String user;
+    private String pass;
+    private String token = null;
+
     /**
-     * @param baseurl the baseurl to connect to
-     * @throws Exception the exception is thrown from jetty http client when starting the client
-     */
-    public AuthedHTTPClient(String baseurl) throws Exception {
-        if (baseurl.endsWith("/")) {
-            baseurl = baseurl.substring(0, baseurl.length() - 1);
-        }
-        this.base = baseurl;
-        
-        
-        //start the underlying client
-        this.start();
-        
-    }
-    
-    /**
-     * implement this method to add your login information to the request
+     * create a new Client
      *
-     * @param request
-     * @throws LoginFailedException
+     * @param baseurl the base url
+     * @param user    the password
+     * @param pass    the password
+     *
+     * @throws Exception some catastrophic failure
      */
-    public abstract void authorizeRequest(@Nonnull Request request) throws LoginFailedException;
-    
+    public AuthedHTTPClient(@Nonnull String baseurl, @Nonnull String user, @Nonnull String pass) throws Exception {
+        this.base = baseurl;
+        this.user = user;
+        this.pass = pass;
+        this.start();
+    }
+
+    public AuthedHTTPClient(@Nonnull String baseurl, @Nullable String token) throws Exception {
+        this.base = baseurl;
+        this.token = token;
+        this.user = null;
+        this.pass = null;
+
+        this.start();
+    }
+
+    @CheckForNull
+    public Request createAuthedDeleteRequest(@Nonnull String url, @CheckForNull JSONObject body) {
+        Request request = createAuthedRequest(url, HttpMethod.DELETE);
+        if (request != null ) {
+            if (body != null) {
+                request.content(new StringContentProvider(body.toString()), "application/json");
+            }
+        }
+        return request;
+
+    }
+
+    @CheckForNull
+    public Request createAuthedPostRequest(@Nonnull String url, @CheckForNull JSONObject body) {
+        Request request = createAuthedRequest(url, HttpMethod.POST);
+        if (request != null) {
+            if (body != null) {
+                request.content(new StringContentProvider(body.toString()), "application/json");
+            }
+        }
+        return request;
+
+    }
+
     /**
-     * create a request to the given url with the given method, if the url is not a complete url the baseurl will be prepended
+     * create a request with Authorization header
+     *
+     * @param url    the url to connect to
+     * @param method the method to use
+     *
+     * @return
+     */
+    @CheckForNull
+    public Request createAuthedRequest(@Nonnull String url, @Nonnull HttpMethod method) {
+        if (token == null) {
+            if (!refreshToken()) {
+                return null;
+            }
+        }
+        Request request = createRequest(url, method);
+        if ( request != null ) {
+            request.header("Authorization", "Bearer " + this.token);
+        }
+        return request;
+    }
+
+    @CheckForNull
+    public Request createAuthedRequest(@Nonnull String url, @Nonnull HttpMethod method, @CheckForNull JSONObject body) {
+        Request request = createAuthedRequest(url, method);
+        if (request != null) {
+            if (body != null) {
+                request.content(new StringContentProvider(body.toString()), "application/json");
+            }
+        }
+        return request;
+    }
+
+    @CheckForNull
+    public Request createAuthedRequest(@Nonnull String url, @Nonnull HttpMethod method, @CheckForNull JSONArray body) {
+
+        Request request = createAuthedRequest(url, method);
+        if (request != null) {
+            if (body != null) {
+                request.content(new StringContentProvider(body.toString()), "application/json");
+            }
+        }
+        return request;
+    }
+
+    @CheckForNull
+    public Request createAuthedRequest(@Nonnull String url, @Nonnull HttpMethod method, @CheckForNull String body) {
+        Request request = createAuthedRequest(url, method);
+        if (request != null) {
+            if (body != null) {
+                request.content(new StringContentProvider(body), "application/text");
+            }
+        }
+        return request;
+
+    }
+
+    /**
+     * create a requesst to the given url with the given method
      *
      * @param url    the url to use
      * @param method the method to use
+     *
      * @return a Request object
      */
-    @Nonnull
-    public Request createRequest(@Nonnull String url, @Nonnull HttpMethod method) {
+    @CheckForNull
+    Request createRequest(@Nonnull String url, @Nonnull HttpMethod method) {
         if (!url.startsWith("http")) {
             url = base + url;
         }
-        
+        logger.info("{}: creating {} request for to {}", this.getUserName(), method.name(), url);
         Request request = newRequest(url);
         request.method(method);
-        request.agent("KosmoS Client");
+        request.agent("KosmoS Authed Client");
         return request;
     }
-    
+
     /**
-     * get the base url
+     * get the result of calling an URL with the given method
      *
-     * @return the base url
-     */
-    @Nonnull
-    public String getBase() {
-        return this.base;
-    }
-    
-    /**
-     * get the max amount of retries
+     * @param url    the URL to call
+     * @param method the method to use [GET,POST,DELETE,PUT...]
      *
-     * @return the amount of retries
-     */
-    public int getMaxRetries() {
-        return this.maxRetries;
-    }
-    
-    protected ContentResponse getResponse(@Nonnull String url, @Nonnull HttpMethod method, int maxRetries, @CheckForNull Integer expectedStatus) throws RequestFailedException {
-        return getResponse(url, method, null, maxRetries, expectedStatus);
-    }
-    
-    protected ContentResponse getResponse(@Nonnull String url, @Nonnull HttpMethod method, @CheckForNull Object body, @CheckForNull Integer expectedStatus) throws RequestFailedException {
-        return getResponse(url, method, body, getMaxRetries(), expectedStatus);
-    }
-    
-    public abstract String getToken();
-    
-    /**
-     * set the max amount of retries (defaults to 3)
-     *
-     * @param maxRetries the new amount of retries
-     */
-    public void setMaxRetries(int maxRetries) {
-        this.maxRetries = maxRetries;
-    }
-    
-    /**
-     * get the response for a given result, if 401 is returned the jwt will be renewed, and it will be tried again
-     *
-     * @param url
-     * @param method
-     * @param body           the body we want to send (can be null)
-     * @param maxRetries     the amount of tests to try again
-     * @param expectedStatus
      * @return
-     * @throws RequestFailedException
      */
-    @Nonnull
-    protected ContentResponse getResponse(@Nonnull String url, @Nonnull HttpMethod method, @CheckForNull Object body, int maxRetries, @CheckForNull Integer expectedStatus) throws RequestFailedException {
-        
-        Request request = createRequest(url, method);
-        authorizeRequest(request);
-        if (body != null) {
-            if (body instanceof JSONObject) {
-                request.content(new StringContentProvider(body.toString()), "application/json");
-                
-                //request.body(new StringRequestContent("application/json", body.toString()));
-            } else if (body instanceof JSONArray) {
-                //request.body(new StringRequestContent("application/json", body.toString()));
-                request.content(new StringContentProvider(body.toString()), "application/json");
-            } else {
-                //request.body(new StringRequestContent("application/text", body.toString()));
-                request.content(new StringContentProvider(body.toString()), "application/text");
+
+    @CheckForNull
+    public JSONArray fetchJSONArray(@Nonnull String url, @Nonnull HttpMethod method) {
+        Request request = createAuthedRequest(url, method);
+        if (request != null) {
+            ContentResponse response = getResponse(request);
+            if (response != null) {
+                return new JSONArray(response.getContentAsString());
             }
+
         }
-        
+        return null;
+
+    }
+
+    @CheckForNull
+    public JSONObject fetchJSONObject(@Nonnull String url, @Nonnull HttpMethod method) {
+        Request request = createAuthedRequest(url, method);
+        if (request != null) {
+            ContentResponse response = getResponse(request);
+            if (response != null) {
+                return new JSONObject(response.getContentAsString());
+            }
+
+        }
+        return null;
+    }
+
+    /**
+     * get the result of calling an URL with GET
+     *
+     * @param url the URL to call
+     *
+     * @return
+     */
+    @CheckForNull
+    public JSONArray getJSONArray(@Nonnull String url) {
+        return fetchJSONArray(url, HttpMethod.GET);
+    }
+
+    @CheckForNull
+    public JSONObject getJSONObject(String url) {
+        return fetchJSONObject(url, HttpMethod.GET);
+    }
+
+    @CheckForNull
+    public String getPassword() {
+        return this.pass;
+    }
+
+    @CheckForNull
+    public ContentResponse getResponse(@Nonnull String url,@Nonnull HttpMethod method,@CheckForNull String body) {
+        Request request = this.createAuthedRequest(url, method, body);
+        if (request != null) {
+            return this.getResponse(request);
+        }
+        return null;
+    }
+
+    @CheckForNull public ContentResponse getResponse(@Nonnull String url,@Nonnull HttpMethod method,@CheckForNull JSONObject body) {
+        Request request = this.createAuthedRequest(url, method, body);
+        if (request != null) {
+            return this.getResponse(request);
+        }
+        return null;
+
+    }
+
+    @CheckForNull public ContentResponse getResponse(@Nonnull String url,@Nonnull HttpMethod method,@CheckForNull JSONArray body) {
+        Request request = this.createAuthedRequest(url, method, body);
+        if (request != null) {
+            return this.getResponse(request);
+        }
+        return null;
+
+    }
+
+    @CheckForNull  public synchronized ContentResponse getResponse(@Nonnull String url,@Nonnull HttpMethod method) {
+
+        Request request = this.createAuthedRequest(url, method);
+        if (request != null) {
+            return this.getResponse(request);
+        }
+        return null;
+
+    }
+
+
+    public abstract boolean addAuthToRequest(@CheckForNull Request request);
+    /**
+     * get the response for a given result, if 401 is returned the jwt will be renewed and it will be tried again
+     *
+     * @param request the request to parse
+     *
+     * @return
+     */
+    @CheckForNull
+    public ContentResponse getResponse(@CheckForNull Request request) {
+        if (request == null ) {
+            return null;
+        }
+        ContentResponse response = null;
         try {
-            ContentResponse response = request.send();
-            int s = response.getStatus();
-            //logger.info("got status: {}",s);
-            
-            
-            //if we gave an expected status
-            if (expectedStatus != null) {
-                //check if the code is correct
-                if (s != expectedStatus) {
-                    if (s == 401) {
-                        //401 means our token expired, lets get a new one
-                        if (maxRetries > 0) {
-                            this.clearToken();
-                            refreshToken();
-                            return getResponse(url, method, body, maxRetries - 1, expectedStatus);
-                        }
-                    }
-                    if (s == 404) {
-                        //no reason to retry, it will never work
-                        throw new NotFoundException(s);
-                    }
-                    if (s == 409) {
-                        //no reason to retry, it will never work
-                        throw new RequestConflictException(s);
-                    }
-                    
-                    if (s == 403) {
-                        //no reason to retry, it will never work
-                        throw new RequestNoAccessException(s);
-                    }
-                    if (maxRetries > 0) {
-                        logger.info("got wrong status?! {} {}", response.getStatus(), expectedStatus);
-                        return getResponse(url, method, body, maxRetries - 1, expectedStatus);
-                    }
-                    throw new RequestWrongStatusExeption(response.getStatus());
+            response = request.send();
+            if (response.getStatus() == 401) {
+                refreshToken();
+                if (!addAuthToRequest(request)) {
+                    return null;
                 }
-                
+
+                response = request.send();
             }
-            
-            
-            return response;
-            
+
         } catch (InterruptedException | TimeoutException | ExecutionException e) {
-            e.printStackTrace();
-            //as long as there are retries left try it again
-            if (maxRetries > 0) {
-                return getResponse(url, method, body, maxRetries - 1, expectedStatus);
-            }
-            throw new RequestFailedException(e);
-            
+            logger.error("could not get Response for Request", e);
         }
-        
-        
+        return response;
+
     }
-    
-    
-    abstract public void clearToken();
-    
-    /**
-     * create a new request with empty body and default retries
-     *
-     * @param url
-     * @param method
-     * @param expectedStatus
-     * @return
-     * @throws RequestFailedException
-     */
-    protected ContentResponse getResponse(@Nonnull String url, @Nonnull HttpMethod method, @Nullable Integer expectedStatus) throws RequestFailedException {
-        return this.getResponse(url, method, null, getMaxRetries(), expectedStatus);
-        
+
+    @CheckForNull public String getUserName() {
+        return this.user;
     }
-    
+
+    @CheckForNull public abstract String login();
+
     /**
-     * implement this method to get a new token from the system
+     * post the given body to a specific url
      *
-     * @throws LoginFailedException
+     * @param url  the url to post it to
+     * @param body the body to post
+     *
+     * @return the JSONObject returned from
      */
-    public abstract boolean refreshToken() throws LoginFailedException;
+    @CheckForNull public JSONObject postJSONObject(@Nonnull String url,@CheckForNull JSONObject body) {
+        ContentResponse response = getResponse(url, HttpMethod.POST, body);
+        if (response != null )  {
+            return new JSONObject(response.getContentAsString());
+        }
+        return null;
+    }
+
+    /**
+     * post the given body to a specific url
+     *
+     * @param url  the url to post it to
+     * @param body the body to post
+     *
+     * @return the JSONObject returned from
+     */
+    @CheckForNull public ContentResponse postJSONObject2(@Nonnull String url,@CheckForNull JSONObject body) {
+        return getResponse(url, HttpMethod.POST, body);
+    }
+
+    /**
+     * get a new JWT token (try to login)
+     *
+     * @return true if login was successful
+     */
+    public boolean refreshToken() {
+        if (user != null && pass != null) {
+            String t = login();
+            if (t != null) {
+                this.token = t;
+                return true;
+            }
+        } else {
+            this.token = "";
+            return true;
+        }
+        return false;
+
+    }
+
+    public void setPassword(@Nonnull  String pass) {
+        this.pass = pass;
+    }
 }

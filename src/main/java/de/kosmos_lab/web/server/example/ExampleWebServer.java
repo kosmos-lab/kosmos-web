@@ -1,19 +1,21 @@
-package de.kosmos_lab.web.server;
+package de.kosmos_lab.web.server.example;
 
-import de.kosmos_lab.utils.FileUtils;
 import de.kosmos_lab.utils.HashFunctions;
 import de.kosmos_lab.utils.StringFunctions;
+import de.kosmos_lab.web.doc.openapi.ApiEndpoint;
 import de.kosmos_lab.web.persistence.ControllerWithPersistence;
 import de.kosmos_lab.web.persistence.IPersistence;
 import de.kosmos_lab.web.persistence.ISesssionPersistence;
 import de.kosmos_lab.web.persistence.JSONPersistence;
 import de.kosmos_lab.web.persistence.exceptions.NoPersistenceException;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import de.kosmos_lab.web.server.JWT;
+import de.kosmos_lab.web.server.WebServer;
+import de.kosmos_lab.web.server.WebSocketService;
+import de.kosmos_lab.web.server.example.servlets.session.KillServlet;
+import de.kosmos_lab.web.server.example.servlets.session.MyServlet;
+import de.kosmos_lab.web.server.example.servlets.user.LoginServlet;
+import de.kosmos_lab.web.server.example.servlets.user.UserViewServlet;
+import jakarta.servlet.http.HttpServlet;
 import org.json.JSONObject;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
@@ -26,83 +28,23 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ExampleWebServer extends WebServer implements ControllerWithPersistence {
+public class ExampleWebServer extends WebServer implements ControllerWithPersistence {
 
+    public static final String DEFAULT_STORAGE = "storage.json";
     private static final long JWTLIFETIME = 3600000;
-    private static final String DEFAULT_STORAGE = "storage.json";
-    private final ConcurrentHashMap<Class<?>, IPersistence> persistences = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<?>, IPersistence> persistences;
     private final ConcurrentHashMap<UUID, Object> usedUUID = new ConcurrentHashMap<>();
-    private final File configFile;
     private String pepper;
     private JWT jwt;
 
 
     public ExampleWebServer(File configFile, boolean testing) throws Exception {
+        super();
+        this.setConfigFile(configFile);
+        this.persistences = new ConcurrentHashMap<>();
         prepare();
-        if (configFile == null) {
-            configFile = new File(getDefaultConfig());
-        }
-        this.configFile = configFile;
-        JSONObject config = readConfig();
+        start();
 
-
-        createPersistence(config);
-
-
-        init(config);
-        FileUtils.writeToFile(configFile, config.toString());
-
-
-        int maxThreads = 10;
-        int minThreads = 2;
-        int idleTimeout = 120;
-
-        QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
-
-        this.server = new Server(threadPool);
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(port);
-        server.addConnector(connector);
-
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        ServletHolder staticFiles = new ServletHolder("default", new DefaultServlet());
-
-        staticFiles.setInitParameter("resourceBase", "./web/");
-
-        context.addServlet(staticFiles, "/*");
-
-
-        //dont judge :p
-        //reflections magic to work around the fact that embedded jetty does not want to read the annotations by itself..
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setUrls(Arrays.asList(ClasspathHelper.forClass(ExampleBaseServlet.class))));
-        for (Class<? extends ExampleBaseServlet> c : reflections.getSubTypesOf(ExampleBaseServlet.class)) {
-            jakarta.servlet.annotation.WebServlet f = c.getAnnotation(jakarta.servlet.annotation.WebServlet.class);
-            if (f != null) {
-                try {
-                    ExampleBaseServlet s = c.getConstructor(ExampleWebServer.class).newInstance(this);
-                    for (String url : f.urlPatterns()) {
-                        context.addServlet(new ServletHolder(s), url);
-                    }
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        server.setHandler(context);
-        try {
-            server.start();
-            //server.dump(System.err);
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
-        }
     }
 
     public ExampleWebServer() throws Exception {
@@ -148,6 +90,7 @@ public abstract class ExampleWebServer extends WebServer implements ControllerWi
 
     @Override
     public void addPersistence(IPersistence perstistence, Class<?> clazz) {
+
         this.persistences.put(clazz, perstistence);
     }
 
@@ -182,7 +125,7 @@ public abstract class ExampleWebServer extends WebServer implements ControllerWi
         String storage_file = persistence.optString("file", null); //we try to read it
 
         if (storage_file == null) {
-            String relativepath = configFile.getParentFile().toString();
+            String relativepath = "config";
             storage_file = relativepath + "/" + getDefaultStorage();
             persistence.put("file", storage_file);
         }
@@ -190,7 +133,7 @@ public abstract class ExampleWebServer extends WebServer implements ControllerWi
         String clazz = persistence.optString("class");
         Class c = null;
         try {
-            if (clazz != null) {
+            if (clazz != null && clazz.length() > 0) {
                 c = Class.forName(clazz);
             }
         } catch (ClassNotFoundException e) {
@@ -269,7 +212,9 @@ public abstract class ExampleWebServer extends WebServer implements ControllerWi
         return HashFunctions.getSaltedAndPepperdHash(input, salt, this.pepper);
     }
 
-    public abstract void init(JSONObject config);
+    public void init(JSONObject config) {
+
+    }
 
     @Override
     public boolean isKnownJWTID(String jwtid) {
@@ -286,10 +231,11 @@ public abstract class ExampleWebServer extends WebServer implements ControllerWi
     }
 
     public void prepare() {
-
+        super.prepare();
+        JSONObject config = readConfig();
+        createPersistence(config);
+        init(config);
     }
-
-    public abstract void sanitizeConfig(JSONObject jsonConfig);
 
     public void stop() {
         try {
@@ -302,5 +248,40 @@ public abstract class ExampleWebServer extends WebServer implements ControllerWi
     public String getDefaultStorage() {
         return DEFAULT_STORAGE;
     }
+
+    public HttpServlet create(Class<? extends HttpServlet> servlet, ApiEndpoint api) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        if (api.userLevel() >= 0) {
+            try {
+                return servlet.getConstructor(ExampleWebServer.class, int.class).newInstance(this, api.userLevel());
+
+            } catch (NoSuchMethodException e) {
+
+                return servlet.getConstructor(WebServer.class, int.class).newInstance(this, api.userLevel());
+
+
+            }
+        } else {
+            try {
+                return servlet.getConstructor(ExampleWebServer.class).newInstance(this);
+
+            } catch (NoSuchMethodException e) {
+
+                return servlet.getConstructor(WebServer.class).newInstance(this);
+
+
+            }
+        }
+    }
+
+
+    public void findServlets(String[] namespaces, Class<? extends HttpServlet> baseServletClass, Class<? extends WebSocketService> baseSocketClass) {
+        super.findServlets(namespaces, baseServletClass, baseSocketClass);
+        //manually add those back to the wanted servlets
+        this.servlets.add(LoginServlet.class);
+        this.servlets.add(UserViewServlet.class);
+        this.servlets.add(KillServlet.class);
+        this.servlets.add(MyServlet.class);
+    }
+
 
 }

@@ -1,4 +1,4 @@
-package de.kosmos_lab.web.server;
+package de.kosmos_lab.web.server.example;
 
 
 
@@ -6,6 +6,8 @@ import de.kosmos_lab.web.exceptions.LoginFailedException;
 import de.kosmos_lab.web.exceptions.NotFoundException;
 import de.kosmos_lab.web.exceptions.ParameterNotFoundException;
 import de.kosmos_lab.web.persistence.exceptions.NoPersistenceException;
+import de.kosmos_lab.web.server.MyHttpServletRequest;
+import de.kosmos_lab.web.server.UnauthorizedException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
