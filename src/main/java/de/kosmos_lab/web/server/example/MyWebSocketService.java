@@ -29,13 +29,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Message(
         name = "ping",
-        payloadRef =
-                "#/components/schemas/ping"
+        payloadRefs = {
+                "#/components/schemas/ping"}
 )
 @Message(
         name = "auth",
-        payloadRef =
-                "#/components/schemas/auth"
+        payloadRefs = {
+                "#/components/schemas/auth"}
 )
 @ObjectSchema(
         componentName = "auth",

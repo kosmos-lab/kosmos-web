@@ -39,8 +39,8 @@ public @interface Message {
 
     ExampleObject[] examples() default {};
 
-    String payloadRef() default "";
-    String xResponseRef() default "";
+    String[] payloadRefs() default {};
+    String[] xResponseRefs() default {};
 
 
 }

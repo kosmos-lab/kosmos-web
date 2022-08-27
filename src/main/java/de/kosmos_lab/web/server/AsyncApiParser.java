@@ -79,19 +79,19 @@ public class AsyncApiParser extends OpenApiParser {
 
         components = new JSONObject();
         JSONObject securitySchemes = new JSONObject();
-        for (Schema schema : server.getClass().getAnnotationsByType(Schema.class)) {
+        /*for (Schema schema : server.getClass().getAnnotationsByType(Schema.class)) {
             String name = schema.name();
 
             if (name.length() > 0) {
                 schemas.add(schema);
             }
-        }
-        for (ObjectSchema schema : server.getClass().getAnnotationsByType(ObjectSchema.class)) {
+        }*/
+        /*for (ObjectSchema schema : server.getClass().getAnnotationsByType(ObjectSchema.class)) {
             String name = schema.componentName();
             if (name.length() > 0) {
                 oschemas.add(schema);
             }
-        }
+        }*/
         /*for (SecuritySchema schema : server.getClass().getAnnotationsByType(SecuritySchema.class)) {
             String name = schema.componentName();
             if (name.length() == 0) {
@@ -112,13 +112,7 @@ public class AsyncApiParser extends OpenApiParser {
         }*/
         add("securitySchemes", securitySchemes, components);
 
-        for (Class<?> c : r.getTypesAnnotatedWith(ApiResponseDescription.class)) {
-            for (ApiResponseDescription ann : c.getAnnotationsByType(ApiResponseDescription.class)) {
-                if (ann.name().length() > 0) {
-                    responses.put(ann.name(), new JSONObject().put("description", ann.description()));
-                }
-            }
-        }
+
         JSONObject servers = new JSONObject();
 
 
@@ -179,7 +173,6 @@ public class AsyncApiParser extends OpenApiParser {
             servers.put("default", new JSONObject().put("protocol", "ws").put("url", "http://none").put("description", "current host"));
         }
         add("servers", servers, json);
-        add("responses", responses, components);
         JSONObject schemajson = new JSONObject();
         JSONObject parametersjson = new JSONObject();
         JSONArray tagarray = new JSONArray();
@@ -248,12 +241,32 @@ public class AsyncApiParser extends OpenApiParser {
         add("description", message.description(), json);
         add("name", message.name(), json);
         add("title", message.title(), json);
+        add("tags", message.tags(), json);
         //JSONArray payload = new JSONArray();
-        if (message.payloadRef().length()>0){
+        if (message.payloadRefs().length==1){
             //payload.put("$ref",message.payloadRef());
-            json.put("payload", new JSONObject().put("$ref",message.payloadRef()));
+            json.put("payload", new JSONObject().put("$ref",message.payloadRefs()[0]));
         }
-
+        if (message.payloadRefs().length>1){
+            JSONArray oneOf =new JSONArray();
+            for (String r : message.payloadRefs()) {
+                oneOf.put(new JSONObject().put("$ref",r));
+                //json.put("payload", new JSONObject().put("$ref",message.payloadRefs()));
+            }
+            json.put("payload",new JSONObject().put("oneOf",oneOf));
+        }
+        if (message.xResponseRefs().length==1){
+            //payload.put("$ref",message.payloadRef());
+            json.put("x-response", new JSONObject().put("$ref",message.xResponseRefs()[0]));
+        }
+        if (message.xResponseRefs().length>1){
+            JSONArray oneOf =new JSONArray();
+            for (String r : message.xResponseRefs()) {
+                oneOf.put(new JSONObject().put("$ref",r));
+                //json.put("payload", new JSONObject().put("$ref",message.payloadRefs()));
+            }
+            json.put("x-response",new JSONObject().put("oneOf",oneOf));
+        }
 
 
         return json;
@@ -261,17 +274,29 @@ public class AsyncApiParser extends OpenApiParser {
     }
 
 
+
+
     private void add(WebSocketEndpoint endpoint, JSONObject channels) {
         JSONObject json = new JSONObject();
-        JSONArray payloads = new JSONArray();
+        JSONArray subscriptions = new JSONArray();
         for (String r : endpoint.subscribeRefs()) {
-            payloads.put(new JSONObject().put("$ref", r));
+            subscriptions.put(new JSONObject().put("$ref", r));
+        }
+        for (Message message : endpoint.subscribeMessages()) {
+            subscriptions.put(toJSON(message));
+        }
+        if (subscriptions.length() > 0) {
+            json.put("subscribe", new JSONObject().put("message", new JSONObject().put("oneOf", subscriptions)));
+        }
+        JSONArray publishes = new JSONArray();
+        for (String r : endpoint.publishRefs()) {
+            publishes.put(new JSONObject().put("$ref", r));
         }
         for (Message message : endpoint.publishMessages()) {
-            payloads.put(toJSON(message));
+            publishes.put(toJSON(message));
         }
-        if (payloads.length() > 0) {
-            json.put("publish", new JSONObject().put("message", new JSONObject().put("oneOf", payloads)));
+        if (publishes.length() > 0) {
+            json.put("publish", new JSONObject().put("message", new JSONObject().put("oneOf", publishes)));
         }
         channels.put(endpoint.path(), json);
 

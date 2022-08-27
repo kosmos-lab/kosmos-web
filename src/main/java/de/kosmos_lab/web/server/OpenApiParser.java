@@ -263,7 +263,7 @@ public class OpenApiParser {
         add("responses", responses, components);
         JSONObject schemajson = new JSONObject();
         JSONObject parametersjson = new JSONObject();
-        JSONArray tagarray = new JSONArray();
+
 
 
         JSONObject paths = new JSONObject();
@@ -327,17 +327,37 @@ public class OpenApiParser {
                 add(name, toJSON(p), parametersjson);
             }
         }
+        /*JSONArray tagarray = new JSONArray();
         for (Tag t : tags) {
             add(t, tagarray);
         }
+        add("tags", tagarray, json);*/
+        add("tags",tags,json);
         add("schemas", schemajson, components);
-        add("tags", tagarray, json);
+
         add("parameters", parametersjson, components);
         add("components", components, json);
         checkExamples();
         return json;
     }
+    public void add(String tag, Tag[] tags, JSONObject json) {
+        JSONArray tagarray = new JSONArray();
+        for (Tag t : tags) {
+            add(t, tagarray);
 
+        }
+        json.put(tag,tagarray);
+
+    }
+    public void add(String tag, HashSet<Tag> tags, JSONObject json) {
+        JSONArray tagarray = new JSONArray();
+        for (Tag t : tags) {
+            add(t, tagarray);
+
+        }
+        json.put(tag,tagarray);
+
+    }
     public JSONObject toJSON(ObjectSchema p) {
         JSONObject pjson = toJSON(p.properties());
         JSONArray ex = new JSONArray();
