@@ -115,7 +115,8 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
         if (origin == null || origin.length() == 0) {
             origin = "*";
         } else {
-            origin = URLEncoder.encode(origin, StandardCharsets.UTF_8);
+            //origin = URLEncoder.encode(origin, StandardCharsets.UTF_8);
+
         }
 
         response.setHeader("Access-Control-Allow-Origin", origin);

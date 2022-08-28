@@ -29,9 +29,15 @@ import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -286,6 +292,7 @@ public class ExampleWebServer extends WebServer implements ControllerWithPersist
         JSONObject config = readConfig();
         createPersistence(config);
         init(config);
+
     }
 
     public void stop() {
@@ -335,7 +342,7 @@ public class ExampleWebServer extends WebServer implements ControllerWithPersist
 
 
         }
-        
+
     }
 
 

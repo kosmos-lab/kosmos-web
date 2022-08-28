@@ -26,12 +26,17 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public abstract class WebServer {
@@ -101,6 +106,7 @@ public abstract class WebServer {
 
 
     public abstract HttpServlet create(Class<? extends HttpServlet> servlet, ApiEndpoint api) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
+
     public abstract WebSocketService create(Class<? extends WebSocketService> servlet, WebSocketEndpoint api) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
     public void createServlet(Class<? extends HttpServlet> servlet) {
@@ -166,9 +172,10 @@ public abstract class WebServer {
 
         server.setHandler(handlers);
         //OpenApiParser.create(this.loadedServlets);
-
+        loadResources();
         server.start();
         //server.dump(System.err);
+
 
     }
 
@@ -177,7 +184,7 @@ public abstract class WebServer {
         if (endpoint != null) {
             logger.info("found: WebSocketService: {} endpoint {}", c.getName(), endpoint.path());
             try {
-                WebSocketService service = create(c,endpoint);
+                WebSocketService service = create(c, endpoint);
                 JettyWebSocketServlet websocketServlet = new JettyWebSocketServlet() {
                     @Override
                     protected void configure(JettyWebSocketServletFactory factory) {
@@ -489,7 +496,82 @@ public abstract class WebServer {
     protected void setConfigFile(File configFile) {
         this.configFile = configFile;
     }
+
     protected Set<Class<? extends WebSocketService>> getWebSocketServices() {
         return this.wsservices;
+    }
+
+
+    public void loadResources() {
+        HashSet<ClassLoader> classLoaders = new HashSet<>();
+
+        for (Class<? extends HttpServlet> servlet : servlets) {
+            ClassLoader loader = servlet.getClassLoader();
+            if (!classLoaders.contains(loader)) {
+                classLoaders.add(loader);
+                logger.info("found classloader {}",loader.getName());
+            }
+
+
+        }
+        for (ClassLoader loader : classLoaders) {
+            try {
+                for (String f : getResourceFiles(loader, "web")) {
+                    logger.info("found resource file {}", f);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private List<String> getResourceFiles(ClassLoader loader, String path) throws IOException {
+        List<String> filenames = new ArrayList<>();
+
+        try (
+                InputStream in = getResourceAsStream(loader, path);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+            String resource;
+
+            while ((resource = br.readLine()) != null) {
+                filenames.add(resource);
+            }
+        }
+
+        return filenames;
+    }
+
+    private List<String> getResourceFiles(String path) throws IOException {
+        List<String> filenames = new ArrayList<>();
+
+        try (
+                InputStream in = getResourceAsStream(path);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+            String resource;
+
+            while ((resource = br.readLine()) != null) {
+                filenames.add(resource);
+            }
+        }
+
+        return filenames;
+    }
+
+    private InputStream getResourceAsStream(ClassLoader loader, String resource) {
+        final InputStream in
+                = loader.getResourceAsStream(resource);
+
+        return in == null ? getClass().getResourceAsStream(resource) : in;
+    }
+
+    private InputStream getResourceAsStream(String resource) {
+        final InputStream in
+                = getContextClassLoader().getResourceAsStream(resource);
+
+        return in == null ? getClass().getResourceAsStream(resource) : in;
+    }
+
+    private ClassLoader getContextClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
     }
 }
