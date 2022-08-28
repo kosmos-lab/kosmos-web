@@ -81,7 +81,7 @@ public abstract  class WebSocketService {
         public void run() {
 
             while (!socket.serverIsStopped()) {
-                socket.broadCast(new JSONObject().put("type", "ping").toString());
+                socket.ping();;
                 /*for (Session s : socket.sessions) {
                     try {
                         s.getRemote().sendString();
@@ -99,5 +99,9 @@ public abstract  class WebSocketService {
                 }
             }
         }
+    }
+
+    public void ping() {
+        broadCast(new JSONObject().put("type", "ping").toString());
     }
 }

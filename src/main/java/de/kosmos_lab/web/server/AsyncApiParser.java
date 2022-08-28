@@ -9,7 +9,6 @@ import de.kosmos_lab.web.annotations.media.ObjectSchema;
 import de.kosmos_lab.web.annotations.media.Schema;
 import de.kosmos_lab.web.annotations.tags.Tag;
 import de.kosmos_lab.web.doc.openapi.ApiEndpoint;
-import de.kosmos_lab.web.doc.openapi.ApiResponseDescription;
 import de.kosmos_lab.web.doc.openapi.Message;
 import de.kosmos_lab.web.doc.openapi.WebSocketEndpoint;
 import org.apache.maven.model.Model;
@@ -242,38 +241,55 @@ public class AsyncApiParser extends OpenApiParser {
         add("name", message.name(), json);
         add("title", message.title(), json);
         add("tags", message.tags(), json);
+        JSONArray payloads = new JSONArray();
+        JSONArray responses = new JSONArray();
         //JSONArray payload = new JSONArray();
-        if (message.payloadRefs().length==1){
+        if (message.payloadRefs().length == 1) {
             //payload.put("$ref",message.payloadRef());
-            json.put("payload", new JSONObject().put("$ref",message.payloadRefs()[0]));
+            payloads.put(new JSONObject().put("$ref", message.payloadRefs()[0]));
         }
-        if (message.payloadRefs().length>1){
-            JSONArray oneOf =new JSONArray();
+        if (message.payloadRefs().length > 1) {
+
             for (String r : message.payloadRefs()) {
-                oneOf.put(new JSONObject().put("$ref",r));
+                payloads.put(new JSONObject().put("$ref", r));
                 //json.put("payload", new JSONObject().put("$ref",message.payloadRefs()));
             }
-            json.put("payload",new JSONObject().put("oneOf",oneOf));
+
         }
-        if (message.xResponseRefs().length==1){
+        if (message.payload().properties().length > 0) {
+            payloads.put(toJSON(message.payload()));
+        }
+
+        if (message.xResponse().properties().length > 0) {
+            responses.put(toJSON(message.xResponse()));
+        }
+        if (message.xResponseRefs().length == 1) {
             //payload.put("$ref",message.payloadRef());
-            json.put("x-response", new JSONObject().put("$ref",message.xResponseRefs()[0]));
+            responses.put(new JSONObject().put("$ref", message.xResponseRefs()[0]));
         }
-        if (message.xResponseRefs().length>1){
-            JSONArray oneOf =new JSONArray();
+        if (message.xResponseRefs().length > 1) {
             for (String r : message.xResponseRefs()) {
-                oneOf.put(new JSONObject().put("$ref",r));
-                //json.put("payload", new JSONObject().put("$ref",message.payloadRefs()));
+                responses.put(new JSONObject().put("$ref", r));
             }
-            json.put("x-response",new JSONObject().put("oneOf",oneOf));
+        }
+
+        if (payloads.length() == 1) {
+            json.put("payload", payloads.get(0));
+        }
+        if (payloads.length() > 1) {
+            json.put("payload", new JSONObject().put("oneOf", payloads));
+        }
+        if (responses.length() == 1) {
+            json.put("x-response", responses.get(0));
+        }
+        if (responses.length() > 1) {
+            json.put("x-response", new JSONObject().put("oneOf", responses));
         }
 
 
         return json;
 
     }
-
-
 
 
     private void add(WebSocketEndpoint endpoint, JSONObject channels) {
