@@ -2,6 +2,7 @@ package de.kosmos_lab.web.annotations.media;
 
 
 
+import de.kosmos_lab.web.annotations.enums.AdditionalProperties;
 import de.kosmos_lab.web.annotations.extensions.Extension;
 
 import java.lang.annotation.ElementType;
@@ -24,5 +25,6 @@ public @interface ObjectSchema {
 
     Extension[] extensions() default {};
     ExampleObject[] examples() default {};
+    AdditionalProperties additionalProperties() default AdditionalProperties.FALSE;
 
 }

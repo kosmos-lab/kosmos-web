@@ -14,11 +14,11 @@ import java.io.IOException;
 
 
 @ApiEndpoint(path = "/doc/openapi.yaml", userLevel = -1)
-public class OpenApiServlet extends BaseServlet {
+public class OpenApiYamlServlet extends BaseServlet {
     static OpenApiParser parser = null;
     public String cached = null;
 
-    public OpenApiServlet(WebServer webServer) {
+    public OpenApiYamlServlet(WebServer webServer) {
         super(webServer);
         if (parser == null) {
             parser = new OpenApiParser(webServer);
@@ -43,8 +43,19 @@ public class OpenApiServlet extends BaseServlet {
             cached = parser.getYAML();
 
         }
-        sendText(request, response, cached);
+        String host = null;
+        try {
+            host = request.getRequest().getHeader("host");
+        } catch (Exception ex ) {
 
+        }
+        if ( host != null ) {
+            sendText(request, response, server.replaceHostName(cached,host));
+
+        }
+        else {
+            sendText(request, response, cached);
+        }
 
     }
 

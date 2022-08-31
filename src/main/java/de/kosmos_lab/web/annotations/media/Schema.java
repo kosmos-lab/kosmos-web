@@ -75,6 +75,8 @@ public @interface Schema {
     AccessMode accessMode() default AccessMode.AUTO;
 
     String example() default "";
+    ExampleObject[] examples() default {};
+
 
     ExternalDocumentation externalDocs() default @ExternalDocumentation;
 

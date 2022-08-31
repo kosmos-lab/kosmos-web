@@ -77,6 +77,8 @@ public abstract class WebServer {
     protected HashSet<String> wssclasses = new HashSet<>();
     protected HashSet<String> servclasses = new HashSet<>();
     protected HashSet<String> paths = new HashSet<>();
+    protected HashSet<String> wsPaths = new HashSet<>();
+
     protected ContextHandlerCollection handlers;
     protected ServletContextHandler context;
     protected HashSet<Class<? extends HttpServlet>> loadedServlets = new HashSet<>();
@@ -182,52 +184,59 @@ public abstract class WebServer {
     public void createWebSocketService(Class<? extends WebSocketService> c) {
         WebSocketEndpoint endpoint = c.getAnnotation(WebSocketEndpoint.class);
         if (endpoint != null) {
-            logger.info("found: WebSocketService: {} endpoint {}", c.getName(), endpoint.path());
-            try {
-                WebSocketService service = create(c, endpoint);
-                JettyWebSocketServlet websocketServlet = new JettyWebSocketServlet() {
-                    @Override
-                    protected void configure(JettyWebSocketServletFactory factory) {
-                        factory.setIdleTimeout(Duration.ofSeconds(60));
-                        factory.setCreator(new WebSocketCreator(service, null));
-                    }
-                };
+            if (!wsPaths.contains(endpoint.path())) {
+                logger.info("found: WebSocketService: {} endpoint {}", c.getName(), endpoint.path());
+                try {
+                    WebSocketService service = create(c, endpoint);
+                    JettyWebSocketServlet websocketServlet = new JettyWebSocketServlet() {
+                        @Override
+                        protected void configure(JettyWebSocketServletFactory factory) {
+                            factory.setIdleTimeout(Duration.ofSeconds(60));
+                            factory.setCreator(new WebSocketCreator(service, null));
+                        }
+                    };
 
-                context.addServlet(new ServletHolder(websocketServlet), endpoint.path());
+                    context.addServlet(new ServletHolder(websocketServlet), endpoint.path());
+                    wsPaths.add(endpoint.path());
 
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
             }
         }
         ServerEndpoint serverEndpoint = c.getAnnotation(ServerEndpoint.class);
         if (serverEndpoint != null) {
-            logger.info("found: WebSocketService: {} endpoint {}", c.getName(), serverEndpoint.value());
-            try {
-                WebSocketService service = c.getConstructor(WebServer.class).newInstance(this);
-                JettyWebSocketServlet websocketServlet = new JettyWebSocketServlet() {
-                    @Override
-                    protected void configure(JettyWebSocketServletFactory factory) {
-                        factory.setIdleTimeout(Duration.ofSeconds(60));
-                        factory.setCreator(new WebSocketCreator(service, null));
-                    }
-                };
+            if (!wsPaths.contains(serverEndpoint.value())) {
 
-                context.addServlet(new ServletHolder(websocketServlet), serverEndpoint.value());
+                logger.info("found: WebSocketService: {} endpoint {}", c.getName(), serverEndpoint.value());
+                try {
+                    WebSocketService service = c.getConstructor(WebServer.class).newInstance(this);
+                    JettyWebSocketServlet websocketServlet = new JettyWebSocketServlet() {
+                        @Override
+                        protected void configure(JettyWebSocketServletFactory factory) {
+                            factory.setIdleTimeout(Duration.ofSeconds(60));
+                            factory.setCreator(new WebSocketCreator(service, null));
+                        }
+                    };
 
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                    context.addServlet(new ServletHolder(websocketServlet), serverEndpoint.value());
+                    wsPaths.add(serverEndpoint.value());
+
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -573,5 +582,11 @@ public abstract class WebServer {
 
     private ClassLoader getContextClassLoader() {
         return Thread.currentThread().getContextClassLoader();
+    }
+
+    public String replaceHostName(String cached,String hostname) {
+        return cached.replace("${host}",hostname);
+
+
     }
 }

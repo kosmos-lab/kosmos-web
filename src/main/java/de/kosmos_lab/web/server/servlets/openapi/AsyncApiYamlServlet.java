@@ -5,7 +5,6 @@ import de.kosmos_lab.web.annotations.responses.ApiResponse;
 import de.kosmos_lab.web.doc.openapi.ApiEndpoint;
 import de.kosmos_lab.web.doc.openapi.ResponseCode;
 import de.kosmos_lab.web.server.AsyncApiParser;
-import de.kosmos_lab.web.server.OpenApiParser;
 import de.kosmos_lab.web.server.WebServer;
 import de.kosmos_lab.web.server.servlets.BaseServlet;
 import de.kosmos_lab.web.server.servlets.BaseServletRequest;
@@ -15,11 +14,11 @@ import java.io.IOException;
 
 
 @ApiEndpoint(path = "/doc/asyncapi.yaml", userLevel = -1)
-public class AsyncApiServlet extends BaseServlet {
+public class AsyncApiYamlServlet extends BaseServlet {
     static AsyncApiParser parser = null;
     public String cached = null;
 
-    public AsyncApiServlet(WebServer webServer) {
+    public AsyncApiYamlServlet(WebServer webServer) {
         super(webServer);
         if (parser == null) {
             parser = new AsyncApiParser(webServer);
@@ -44,7 +43,20 @@ public class AsyncApiServlet extends BaseServlet {
             cached = parser.getYAML();
 
         }
-        sendText(request, response, cached);
+
+        String host = null;
+        try {
+            host = request.getRequest().getHeader("host");
+        } catch (Exception ex ) {
+
+        }
+        if ( host != null ) {
+            sendText(request, response, server.replaceHostName(cached,host));
+
+        }
+        else {
+            sendText(request, response, cached);
+        }
 
 
     }

@@ -16,7 +16,7 @@ public @interface ExampleObject {
 
     String summary() default "";
 
-    String value() default "";
+    String value();
 
     String externalValue() default "";
 

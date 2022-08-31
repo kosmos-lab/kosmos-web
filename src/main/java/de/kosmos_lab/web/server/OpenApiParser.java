@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.kosmos_lab.web.annotations.ExternalDocumentation;
 import de.kosmos_lab.web.annotations.Operation;
 import de.kosmos_lab.web.annotations.Parameter;
+import de.kosmos_lab.web.annotations.enums.AdditionalProperties;
 import de.kosmos_lab.web.annotations.enums.Explode;
 import de.kosmos_lab.web.annotations.enums.SchemaType;
 import de.kosmos_lab.web.annotations.headers.Header;
@@ -50,7 +51,9 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -72,7 +75,7 @@ public class OpenApiParser {
     private HashSet<Tag> tags = new HashSet<>();
     private ResourceBundle labels = null;
     private HashMap<String, JSONObject> mResponses = new HashMap<>();
-    private JSONObject components;
+    private JSONObject components = new JSONObject();;
     private LinkedList<Example> examples = new LinkedList<>();
     private JSONObject responses = new JSONObject();
 
@@ -100,7 +103,7 @@ public class OpenApiParser {
     }
 
 
-    public String getYAML() throws IOException {
+    public synchronized String getYAML() throws IOException {
         return asYaml(getJSON().toString());
     }
 
@@ -152,9 +155,9 @@ public class OpenApiParser {
         json = new JSONObject();
 
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("org.reflections")).setLevel(Level.OFF);
-        Reflections r = new Reflections("");
 
-        add("asyncapi", "2.4.0", json);
+
+        add("openapi", "3.0.3", json);
 
         JSONObject info = new JSONObject();
         Info infoAnnotation = server.getClass().getAnnotation(Info.class);
@@ -175,7 +178,42 @@ public class OpenApiParser {
         }
         add("info", info, json);
 
-        components = new JSONObject();
+
+        JSONArray servers = new JSONArray();
+        for (Reflections r : new Reflections[]{new Reflections(""), new Reflections("de.kosmos_lab.web.exceptions")}) {
+            for (Class<?> c : r.getTypesAnnotatedWith(ApiResponse.class)) {
+                for (ApiResponse ann : c.getAnnotationsByType(ApiResponse.class)) {
+                /*if (c.isAssignableFrom(Exception.class)) {
+                    responses.put(c.getSimpleName().replace("Exception", "Error"), toJSON(ann));
+                }*/
+                    if (Exception.class.isAssignableFrom(c)) {
+                        responses.put(c.getSimpleName().replace("Exception", "Error"), toJSON(ann));
+                    }
+                    if (ann.componentName().length() > 0) {
+                        responses.put(ann.componentName(), toJSON(ann));
+                    }
+
+                }
+            }
+            for (Class<?> c : r.getTypesAnnotatedWith(ApiResponseDescription.class)) {
+                for (ApiResponseDescription ann : c.getAnnotationsByType(ApiResponseDescription.class)) {
+                    if (ann.name().length() > 0) {
+                        responses.put(ann.name(), new JSONObject().put("description", ann.description()));
+                    }
+                }
+
+            }
+
+            for (Class<?> c : r.getTypesAnnotatedWith(Server.class)) {
+                for (Server s : c.getAnnotationsByType(Server.class)) {
+                    logger.info("found server {}", s);
+                    JSONObject j = new JSONObject();
+                    add("description", s.description(), j);
+                    add("url", s.url(), j);
+                    servers.put(j);
+                }
+            }
+        }
         JSONObject securitySchemes = new JSONObject();
         for (Schema schema : server.getClass().getAnnotationsByType(Schema.class)) {
             String name = schema.name();
@@ -217,7 +255,32 @@ public class OpenApiParser {
                 responses.put(ann.name(), new JSONObject().put("description", ann.description()));
             }
         }*/
-        for (Class<?> c : r.getTypesAnnotatedWith(ApiResponse.class)) {
+
+
+        for (Server s : server.getClass().getAnnotationsByType(Server.class)) {
+            logger.info("found server {}", s);
+            JSONObject j = new JSONObject();
+            add("description", s.description(), j);
+            add("url", s.url(), j);
+            servers.put(j);
+        }
+        if (servers.length() == 0) {
+            servers.put(new JSONObject().put("url", "http://none").put("description", "current host"));
+        }
+
+        add("servers", servers, json);
+
+        JSONObject schemajson = new JSONObject();
+        JSONObject parametersjson = new JSONObject();
+
+
+        JSONObject paths = new JSONObject();
+        for (Class<? extends HttpServlet> c : getServlets()) {
+            for (ApiResponseDescription ann : c.getAnnotationsByType(ApiResponseDescription.class)) {
+                if (ann.name().length() > 0) {
+                    responses.put(ann.name(), new JSONObject().put("description", ann.description()));
+                }
+            }
             for (ApiResponse ann : c.getAnnotationsByType(ApiResponse.class)) {
                 /*if (c.isAssignableFrom(Exception.class)) {
                     responses.put(c.getSimpleName().replace("Exception", "Error"), toJSON(ann));
@@ -230,44 +293,6 @@ public class OpenApiParser {
                 }
 
             }
-        }
-        for (Class<?> c : r.getTypesAnnotatedWith(ApiResponseDescription.class)) {
-            for (ApiResponseDescription ann : c.getAnnotationsByType(ApiResponseDescription.class)) {
-                if (ann.name().length() > 0) {
-                    responses.put(ann.name(), new JSONObject().put("description", ann.description()));
-                }
-            }
-        }
-        JSONArray servers = new JSONArray();
-        for (Server s : server.getClass().getAnnotationsByType(Server.class)) {
-            logger.info("found server {}", s);
-            JSONObject j = new JSONObject();
-            add("description", s.description(), j);
-            add("url", s.url(), j);
-            servers.put(j);
-        }
-        if (servers.length() == 0) {
-            servers.put(new JSONObject().put("url", "http://none").put("description", "current host"));
-        }
-
-        for (Class<?> c : r.getTypesAnnotatedWith(Server.class)) {
-            for (Server s : c.getAnnotationsByType(Server.class)) {
-                logger.info("found server {}", s);
-                JSONObject j = new JSONObject();
-                add("description", s.description(), j);
-                add("url", s.url(), j);
-                servers.put(j);
-            }
-        }
-        add("servers", servers, json);
-        add("responses", responses, components);
-        JSONObject schemajson = new JSONObject();
-        JSONObject parametersjson = new JSONObject();
-
-
-
-        JSONObject paths = new JSONObject();
-        for (Class<? extends HttpServlet> c : getServlets()) {
             ApiEndpoint a = c.getAnnotation(ApiEndpoint.class);
             if (a != null) {
                 if (!a.hidden()) {
@@ -332,43 +357,55 @@ public class OpenApiParser {
             add(t, tagarray);
         }
         add("tags", tagarray, json);*/
-        add("tags",tags,json);
+        add("tags", tags, json);
         add("schemas", schemajson, components);
-
+        add("responses", responses, components);
         add("parameters", parametersjson, components);
         add("components", components, json);
         checkExamples();
         return json;
     }
+
     public void add(String tag, Tag[] tags, JSONObject json) {
         JSONArray tagarray = new JSONArray();
         for (Tag t : tags) {
             add(t, tagarray);
 
         }
-        json.put(tag,tagarray);
+        json.put(tag, tagarray);
 
     }
+
     public void add(String tag, HashSet<Tag> tags, JSONObject json) {
         JSONArray tagarray = new JSONArray();
         for (Tag t : tags) {
             add(t, tagarray);
 
         }
-        json.put(tag,tagarray);
+        json.put(tag, tagarray);
 
     }
+
     public JSONObject toJSON(ObjectSchema p) {
         JSONObject pjson = toJSON(p.properties());
+        if ( p.additionalProperties() == AdditionalProperties.TRUE) {
+            pjson.put("additionalProperties",true);
+        }
+        else if( p.additionalProperties() == AdditionalProperties.FALSE) {
+            pjson.put("additionalProperties",false);
+        }
         JSONArray ex = new JSONArray();
         for (ExampleObject e : p.examples()) {
-            ex.put(parseValue(e.value()));
+            if (e.value().length() > 0) {
+                ex.put(parseValue(e.value()));
+            }
             //add("value", e.value(), json, true);
 
 
         }
         //add("examples", ex, pjson);
-        pjson.put("examples", ex);
+        add("examples", ex, pjson);
+        //pjson.put("examples", ex);
         return pjson;
     }
 
@@ -496,27 +533,9 @@ public class OpenApiParser {
         }
         try {
             for (Class<?> ex : method.getExceptionTypes()) {
+                logger.info("{} throws exception {}:", endpoint.path(), ex.getSimpleName());
                 String n = ex.getSimpleName().replace("Exception", "Error");
-                ApiResponse apiresp = ex.getAnnotation(ApiResponse.class);
-                if (apiresp != null) {
-                    //only add if we have a valid description for the Exception
-                    if (responses.has(n)) {
-                        //JSONObject rjson = toJSON(apiresp);
-                        ResponseCode sc = apiresp.responseCode();
-                        //add the response, but only if there is not already a description for that given exception
-                        if (sc.statusCode() != -1) {
-                            String ssc = String.valueOf(sc.statusCode());
-                            if (!resp.has(ssc)) {
-                                resp.put(ssc, new JSONObject().put("$ref", "#/components/responses/" + n));
-                            }
-                        } else {
-                            String ssc = String.valueOf(sc.status());
-                            if (!resp.has(ssc)) {
-                                resp.put(ssc, new JSONObject().put("$ref", "#/components/responses/" + n));
-                            }
-                        }
-                    }
-                }
+                addException(n, ex, resp);
 
 
             }
@@ -524,9 +543,9 @@ public class OpenApiParser {
 
         }
         if (endpoint.userLevel() != -1) {
-            if (!resp.has(String.valueOf(WebServer.STATUS_NO_AUTH))) {
+            /*if (!resp.has(String.valueOf(WebServer.STATUS_NO_AUTH))) {
                 resp.put(String.valueOf(WebServer.STATUS_NO_AUTH), new JSONObject().put("$ref", "#/components/responses/NoAuthError"));
-            }
+            }*/
             /*if (!resp.has(String.valueOf(KosmoSServlet.STATUS_FORBIDDEN))) {
                 resp.put(String.valueOf(KosmoSServlet.STATUS_FORBIDDEN), new JSONObject().put("$ref", "#/components/responses/NoAuthError"));
             }*/
@@ -549,6 +568,44 @@ public class OpenApiParser {
             j.put("requestBody", requestBody);
         }
 
+
+    }
+
+    protected void addException(String n, Class<?> ex, JSONObject resp) {
+        ApiResponse apiresp = ex.getAnnotation(ApiResponse.class);
+        if (apiresp != null) {
+            logger.info("Found ApiResponse for {} {}", ex.getSimpleName(), apiresp);
+            if (apiresp.componentName().length() > 0) {
+                n = apiresp.componentName();
+            }
+            //only add if we have a valid description for the Exception
+            if (!responses.has(n)) {
+
+                responses.put(n, toJSON(apiresp));
+            }
+            //JSONObject rjson = toJSON(apiresp);
+            ResponseCode sc = apiresp.responseCode();
+            //add the response, but only if there is not already a description for that given exception
+            if (sc.statusCode() != -1) {
+                String ssc = String.valueOf(sc.statusCode());
+                if (!resp.has(ssc)) {
+                    resp.put(ssc, new JSONObject().put("$ref", "#/components/responses/" + n));
+                }
+            } else {
+                String ssc = String.valueOf(sc.status());
+                if (!resp.has(ssc)) {
+                    resp.put(ssc, new JSONObject().put("$ref", "#/components/responses/" + n));
+                }
+            }
+
+        } else {
+            if (ex.getSuperclass() != null) {
+                logger.info("Found NO ApiResponse for {} - now looking for {}", ex.getSimpleName(), ex.getSuperclass());
+                addException(n, ex.getSuperclass(), resp);
+            } else {
+                logger.info("Found NO ApiResponse for {} - {}", ex.getSimpleName(), ex.getCanonicalName());
+            }
+        }
 
     }
 
@@ -668,6 +725,75 @@ public class OpenApiParser {
 
     }
 
+    public JSONObject getExamplesObject(ExampleObject[] examples) {
+        LinkedList<ExampleObject> ex = new LinkedList<>();
+
+        for (ExampleObject e : examples) {
+            ex.add(e);
+        }
+        return getExamplesObject(ex);
+
+    }
+
+    public JSONObject getExamplesObject(List<ExampleObject> examples) {
+        HashMap<String, String> ex = new HashMap<>();
+        for (ExampleObject e : examples) {
+            ex.put(e.value(), e.name());
+        }
+        return getExamplesObject(ex);
+
+    }
+
+    public JSONObject getExamplesObject(HashMap<String, String> examples) {
+        JSONObject ex = new JSONObject();
+        int emptynames = 0;
+
+        for (Map.Entry<String, String> entry : examples.entrySet()) {
+            String name = entry.getValue();
+            if (name == null || name.length() == 0) {
+                name = String.format("Example %d", ++emptynames);
+            }
+            ex.put(name, new JSONObject().put("value", entry.getKey()));
+            //ex.put(e);
+        }
+        return ex;
+
+    }
+    public JSONArray getExamplesArray(ExampleObject[] examples) {
+        LinkedList<ExampleObject> ex = new LinkedList<>();
+
+        for (ExampleObject e : examples) {
+            ex.add(e);
+        }
+        return getExamplesArray(ex);
+
+    }
+
+    public JSONArray getExamplesArray(List<ExampleObject> examples) {
+        HashMap<String, String> ex = new HashMap<>();
+        for (ExampleObject e : examples) {
+            ex.put(e.value(), e.name());
+        }
+        return getExamplesArray(ex);
+
+    }
+
+    public JSONArray getExamplesArray(HashMap<String, String> examples) {
+        JSONArray ex = new JSONArray();
+        int emptynames = 0;
+
+        for (Map.Entry<String, String> entry : examples.entrySet()) {
+            String name = entry.getValue();
+            if (name == null || name.length() == 0) {
+                name = String.format("Example %d", ++emptynames);
+            }
+            //ex.put(new JSONObject().put("name",name).put("value", entry.getKey()));
+            ex.put(parseValue(entry.getKey()));
+            //ex.put(e);
+        }
+        return ex;
+
+    }
     public JSONObject toJSON(Parameter p) {
         JSONObject pjson = new JSONObject();
         if (p.ref().length() > 0) {
@@ -677,11 +803,22 @@ public class OpenApiParser {
 
             add("name", p.name(), pjson);
             JSONObject schema = toJSON(p.schema());
-            add("examples", p.examples(), pjson);
+
+            HashMap<String, String> allExamples = extractExamples(p);
+
+
+            add("examples", getExamplesObject(allExamples), pjson);
+
             if (schema.length() > 0) {
+                /*if (p.schema().description().length()>0 && !pjson.has("description"))  {
+                    pjson.put("description",p.schema().description());
+                }*/
                 add("schema", schema, pjson);
 
                 JSONObject j = null;
+                for (String e : allExamples.keySet()) {
+                    examples.add(new Example(e, schema, p.schema().type()));
+                }
                 try {
                     //j = createJSONSchemaFromSchema(schema);
 
@@ -811,6 +948,9 @@ public class OpenApiParser {
                         }
                         if (!cjson.has("schema")) {
                             add("schema", toJSON(c.schema()), cjson);
+                            /*if (c.schema().description().length()>0 && !cjson.has("description"))  {
+                                cjson.put("description",c.schema().description());
+                            }*/
                         }
 
                     }
@@ -862,6 +1002,9 @@ public class OpenApiParser {
                     add("description", c.description(), cjson);
                     //add("name", c.name(), cjson);
                     add("schema", toJSON(c.schema()), cjson);
+                    /*if (c.schema().description().length()>0 && !cjson.has("description"))  {
+                        cjson.put("description",c.schema().description());
+                    }*/
 
                     //add("required", String.valueOf(c.required()), cjson);
 
@@ -969,6 +1112,8 @@ public class OpenApiParser {
 
             //add("name", schema.name(), sjson);
             add("title", schema.title(), sjson);
+            add("description", schema.description(), sjson);
+
             add("multipleOf", schema.multipleOf(), sjson, 0.0);
             add("exclusiveMaximum", schema.exclusiveMaximum(), sjson, false);
             add("exclusiveMaximum", schema.exclusiveMaximum(), sjson, false);
@@ -1010,15 +1155,76 @@ public class OpenApiParser {
             add("DiscriminatorMapping", schema.discriminatorMapping(), sjson);
             add("additionalProperties", schema.additionalProperties(), sjson, true);
             add("subTypes", schema.subTypes(), sjson);
+            JSONArray ex = new JSONArray();
+            for (Map.Entry<String, String> e : extractExamples(schema).entrySet()) {
+                examples.add(new Example(e.getKey(), sjson, schema.type()));
+                //ex.put(parseValue(e.getKey()));
+
+            }
+            if (ex.length() > 0) {
+                add("examples", ex, sjson);
+            }
+            /*JSONArray ex = new JSONArray();
             if (schema.example().length() > 0) {
-                add("example", schema.example(), sjson);
+                //add("example", schema.example(), sjson);
+                ex.put(parseValue(schema.example()));
 
                 examples.add(new Example(schema.example(), sjson, schema.type()));
 
 
             }
+
+            for (ExampleObject e : schema.examples()) {
+                ex.put(parseValue(e.value()));
+                //add("value", e.value(), json, true);
+
+
+            }
+            if ( ex.length()>0) {
+                add("examples",ex,sjson);
+            }*/
         }
         return sjson;
+    }
+
+    public HashMap<String, String> extractExamples(Parameter parameter) {
+        HashMap<String, String> exx = extractExamples(parameter.schema());
+        for (ExampleObject e : parameter.examples()) {
+            exx.put(e.value(), e.name());
+        }
+        if (parameter.example().length() > 0) {
+            exx.put(parameter.example(), "");
+        }
+
+        return exx;
+    }
+
+    public HashMap<String, String> extractExamples(Schema schema) {
+        HashMap<String, String> exx = extractExamples(schema.example(), schema.examples());
+
+        return exx;
+    }
+
+    public HashMap<String, String> extractExamples(String example, ExampleObject[] examples) {
+        HashMap<String, String> exx = new HashMap<String, String>();
+        if (example != null && example.length() > 0) {
+            //add("example", schema.example(), sjson);
+
+            exx.put(example, "");
+
+
+        }
+
+        for (ExampleObject e : examples) {
+            //add("value", e.value(), json, true);
+            if (e.value().length() > 0) {
+                exx.put(e.value(), e.name());
+            }
+
+
+        }
+
+        return exx;
     }
 
     public void add(String tag, Schema schema, JSONObject json) {
@@ -1029,6 +1235,9 @@ public class OpenApiParser {
             json.put(tag, sjson);
 
         }
+        /*if (schema.description().length()>0 && !json.has("description"))  {
+            json.put("description",schema.description());
+        }*/
 
     }
 

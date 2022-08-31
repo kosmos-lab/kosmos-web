@@ -3,6 +3,7 @@ package de.kosmos_lab.web.server.servlets;
 
 import de.kosmos_lab.web.annotations.responses.ApiResponse;
 import de.kosmos_lab.web.exceptions.ServletException;
+import de.kosmos_lab.web.exceptions.UnauthorizedException;
 import de.kosmos_lab.web.server.WebServer;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,8 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,9 +26,9 @@ import static de.kosmos_lab.web.server.WebServer.STATUS_FAILED;
 public class BaseServlet extends HttpServlet {
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger("KosmoSServlet");
     protected final WebServer server;
-protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
-    ;
     final ALLOW_AUTH allow_auth;
+    ;
+    protected ConcurrentHashMap<String, Object> values = new ConcurrentHashMap();
 
     /*public <T> T get(String key,Class<T> clazz) {
         return (T) values.get(key);
@@ -83,6 +82,13 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
 
     }
 
+    public static void sendJSON(BaseServletRequest req, HttpServletResponse response, String text) throws IOException {
+        response.setHeader("Content-Type", "application/json");
+        response.getWriter().print(text);
+
+
+    }
+
     public static void sendJWT(BaseServletRequest req, HttpServletResponse response, String text) throws IOException {
         response.setHeader("Content-Type", "application/jwt");
         response.getWriter().print(text);
@@ -125,6 +131,7 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
     }
 
     public void handleException(HttpServletRequest request, HttpServletResponse response, Exception e) {
+        logger.warn("got exception {}",e.getMessage(),e);
         if (e instanceof de.kosmos_lab.web.exceptions.ServletException) {
             ApiResponse r = e.getClass().getAnnotation(ApiResponse.class);
             if (r != null && r.responseCode() != null) {
@@ -145,15 +152,14 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-        }
-        else if (e instanceof ValidationException) {
+        } else if (e instanceof ValidationException) {
             response.setStatus(WebServer.STATUS_VALIDATION_FAILED);
             try {
                 response.getWriter().print(e.getMessage());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-        }else {
+        } else {
             ApiResponse r = e.getClass().getAnnotation(ApiResponse.class);
             if (r != null && r.responseCode() != null) {
                 response.setStatus(r.responseCode().statusCode());
@@ -205,16 +211,17 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
 
             throws IOException {
 
+        try {
+            if (this.isAllowed(request, response)) {
 
-        if (this.isAllowed(request, response)) {
-            try {
                 addCORSHeader(request, response);
 
                 delete(new BaseServletRequest(request), response);
 
-            } catch (Exception e) {
-                handleException(request, response, e);
+
             }
+        } catch (Exception e) {
+            handleException(request, response, e);
         }
 
     }
@@ -222,14 +229,15 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
     public void doGet(HttpServletRequest request, HttpServletResponse response)
 
             throws IOException {
+        try {
+            if (this.isAllowed(request, response)) {
 
-        if (this.isAllowed(request, response)) {
-            try {
                 addCORSHeader(request, response);
                 get(new BaseServletRequest(request), response);
-            } catch (Exception e) {
-                handleException(request, response, e);
+
             }
+        } catch (Exception e) {
+            handleException(request, response, e);
         }
 
     }
@@ -246,16 +254,17 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
             throws IOException {
 
         //logger.info("HITTING doPOST");
+        try {
+            if (this.isAllowed(request, response)) {
 
-        if (this.isAllowed(request, response)) {
-            try {
                 addCORSHeader(request, response);
 
                 post(new BaseServletRequest(request), response);
-            } catch (Exception e) {
-                handleException(request, response, e);
-            }
 
+
+            }
+        } catch (Exception e) {
+            handleException(request, response, e);
         }
 
     }
@@ -264,14 +273,16 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
 
             throws IOException {
         //super.doPut(request, response);
-        if (this.isAllowed(request, response)) {
-            try {
+        try {
+            if (this.isAllowed(request, response)) {
+
                 addCORSHeader(request, response);
 
                 put(new BaseServletRequest(request), response);
-            } catch (Exception e) {
-                handleException(request, response, e);
+
             }
+        } catch (Exception e) {
+            handleException(request, response, e);
         }
 
     }
@@ -282,7 +293,7 @@ protected ConcurrentHashMap<String,Object> values = new ConcurrentHashMap();
         response.setStatus(de.kosmos_lab.web.server.WebServer.STATUS_METHOD_NOT_ALLOWED);
     }
 
-    protected boolean isAllowed(HttpServletRequest request, HttpServletResponse response) {
+    protected boolean isAllowed(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException {
         return true;
     }
 

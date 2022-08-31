@@ -4,11 +4,12 @@ import de.kosmos_lab.web.annotations.responses.ApiResponse;
 import de.kosmos_lab.web.doc.openapi.ResponseCode;
 import de.kosmos_lab.web.server.WebServer;
 
-@ApiResponse(responseCode = @ResponseCode(statusCode = WebServer.STATUS_FORBIDDEN), description = "You have no access to this")
+@ApiResponse(responseCode = @ResponseCode(statusCode = WebServer.STATUS_NO_AUTH), description = "You're not authorized! You need to provide authentication")
 public class UnauthorizedException extends ServletException {
     public UnauthorizedException() {
-        super("You are not allowed to access this");
+        super(UnauthorizedException.class.getAnnotation(ApiResponse.class).description());
     }
+
     public UnauthorizedException(String message) {
         super(message);
     }

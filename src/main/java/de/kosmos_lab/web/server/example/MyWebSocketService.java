@@ -7,6 +7,7 @@ import de.kosmos_lab.web.annotations.media.ObjectSchema;
 import de.kosmos_lab.web.annotations.media.Schema;
 import de.kosmos_lab.web.annotations.media.SchemaProperty;
 import de.kosmos_lab.web.data.IUser;
+import de.kosmos_lab.web.doc.openapi.Channel;
 import de.kosmos_lab.web.doc.openapi.Message;
 import de.kosmos_lab.web.doc.openapi.WebSocketEndpoint;
 import de.kosmos_lab.web.exceptions.LoginFailedException;
@@ -69,10 +70,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebSocketEndpoint(
         path = "/ws",
         load = false,
-        subscribeRefs = {
+        channels = @Channel(subscribeRefs = {
                 "#/components/messages/ping",
                 "#/components/messages/auth"
-        }
+        })
 )
 @WebSocket
 public class MyWebSocketService extends de.kosmos_lab.web.server.WebSocketService {

@@ -4,7 +4,6 @@ import de.kosmos_lab.web.annotations.Operation;
 import de.kosmos_lab.web.annotations.responses.ApiResponse;
 import de.kosmos_lab.web.doc.openapi.ApiEndpoint;
 import de.kosmos_lab.web.doc.openapi.ResponseCode;
-import de.kosmos_lab.web.server.OpenApiParser;
 import de.kosmos_lab.web.server.WebServer;
 import de.kosmos_lab.web.server.servlets.BaseServlet;
 import de.kosmos_lab.web.server.servlets.BaseServletRequest;
@@ -12,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import static de.kosmos_lab.web.server.servlets.openapi.OpenApiServlet.parser;
+import static de.kosmos_lab.web.server.servlets.openapi.OpenApiYamlServlet.parser;
 
 
 @ApiEndpoint(path = "/doc/openapi.json", userLevel = -1)
@@ -40,7 +39,19 @@ public class OpenApiJSONServlet extends BaseServlet {
             cached = parser.getJSON().toString(2);
 
         }
-        sendText(request,response,cached);
+        String host = null;
+        try {
+            host = request.getRequest().getHeader("host");
+        } catch (Exception ex ) {
+
+        }
+        if ( host != null ) {
+            sendJSON(request, response, server.replaceHostName(cached,host));
+
+        }
+        else {
+            sendJSON(request, response, cached);
+        }
 
 
     }

@@ -42,7 +42,7 @@
         <maven.compiler.release>11</maven.compiler.release>
         <mavenplugin.version>3.2.0</mavenplugin.version>
         <!--<jettyVersion>9.4.32.v20200930</jettyVersion>-->
-        <finalName>kosmos</finalName>
+        <finalName>web</finalName>
         <jettyVersion>11.0.11</jettyVersion>
         <spotbugsVersion>4.5.3</spotbugsVersion>
         <pf4jVersion>3.6.0</pf4jVersion>
