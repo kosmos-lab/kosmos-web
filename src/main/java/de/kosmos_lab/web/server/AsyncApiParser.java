@@ -363,7 +363,7 @@ public class AsyncApiParser extends OpenApiParser {
             }
             if (endpoint.enableMQTT()) {
                 JSONObject j = new JSONObject()
-                        .put("topic", endpoint.path());
+                        .put("topic", channel.path());
                 if (channel.needsMessage()) {
                     j.put("message", "{message}");
                 }
