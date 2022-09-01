@@ -4,7 +4,6 @@ package de.kosmos_lab.web.client;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.http.HttpMethod;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,7 @@ public class MyTestClient extends AuthedHTTPClient {
     }
 
     @Override
-    public boolean addAuthToRequest(@Nullable Request request) {
+    public boolean addAuthToRequest(@CheckForNull Request request) {
         request.header("Authorization", "Bearer " + this.token);
         return true;
     }

@@ -1,6 +1,7 @@
 package de.kosmos_lab.web.server;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -154,8 +155,8 @@ public class OpenApiParser {
         }
         json = new JSONObject();
 
-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("org.reflections")).setLevel(Level.OFF);
-
+//        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("org.reflections")).setLevel(Level.OFF);
+        ((Logger) LoggerFactory.getLogger("org.reflections")).setLevel(Level.OFF);
 
         add("openapi", "3.0.3", json);
 

@@ -1,6 +1,9 @@
 # Changelog
+# v0.1.3.2
+* minor changes
 
-
+# v0.1.3
+* added asyncapi
 # v0.1.2
 * changed exception workflow a bit
 

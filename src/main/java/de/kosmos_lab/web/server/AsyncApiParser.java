@@ -1,6 +1,7 @@
 package de.kosmos_lab.web.server;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import de.kosmos_lab.web.annotations.Parameter;
 import de.kosmos_lab.web.annotations.enums.SchemaType;
 import de.kosmos_lab.web.annotations.info.AsyncInfo;
@@ -50,7 +51,8 @@ public class AsyncApiParser extends OpenApiParser {
         }
         json = new JSONObject();
 
-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("org.reflections")).setLevel(Level.OFF);
+        //((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("org.reflections")).setLevel(Level.OFF);
+        ((Logger) LoggerFactory.getLogger("org.reflections")).setLevel(Level.OFF);
         Reflections r = new Reflections("");
 
         add("asyncapi", "2.4.0", json);

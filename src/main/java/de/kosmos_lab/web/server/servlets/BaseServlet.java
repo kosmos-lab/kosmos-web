@@ -131,7 +131,7 @@ public class BaseServlet extends HttpServlet {
     }
 
     public void handleException(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        logger.warn("got exception {}",e.getMessage(),e);
+        //logger.warn("got exception {}",e.getMessage(),e);
         if (e instanceof de.kosmos_lab.web.exceptions.ServletException) {
             ApiResponse r = e.getClass().getAnnotation(ApiResponse.class);
             if (r != null && r.responseCode() != null) {
