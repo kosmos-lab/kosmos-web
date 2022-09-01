@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.kosmos-lab</groupId>
-    <version>${revision}</version>
+    <version>0.1.3</version>
     <artifactId>web</artifactId>
     <name>kosmos-web</name>
     <description>The KosmoS Platform</description>
@@ -35,7 +35,6 @@
         </license>
     </licenses>
     <properties>
-        <revision>0.1.3</revision>
         <humanize.version>1.2.2</humanize.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
