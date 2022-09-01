@@ -358,8 +358,7 @@ public class AsyncApiParser extends OpenApiParser {
                     j.put("userLevel", channel.userLevel());
                     j.put("authRequired", true);
                 }
-                bindings.put("ws", j
-                );
+                bindings.put("ws", j);
             }
             if (endpoint.enableMQTT()) {
                 JSONObject j = new JSONObject()
@@ -371,12 +370,11 @@ public class AsyncApiParser extends OpenApiParser {
                     j.put("userLevel", channel.userLevel());
                     j.put("authRequired", true);
                 }
-                bindings.put("mqtt",
-                        j);
+                bindings.put("mqtt", j);
             }
             json.put("bindings", bindings);
         } else {
-            if (channel.path().length() > 0) {
+            if (endpoint.path().length() > 0) {
                 JSONObject bindings = new JSONObject();
                 if (endpoint.enableWS()) {
                     JSONObject j = new JSONObject()
@@ -385,8 +383,7 @@ public class AsyncApiParser extends OpenApiParser {
                     if (channel.needsMessage()) {
                         j.put("message", "{message}");
                     }
-                    bindings.put("ws", j
-                    );
+                    bindings.put("ws", j);
                 }
                 if (endpoint.enableMQTT()) {
                     JSONObject j = new JSONObject()
@@ -394,12 +391,11 @@ public class AsyncApiParser extends OpenApiParser {
                     if (channel.needsMessage()) {
                         j.put("message", "{message}");
                     }
-                    bindings.put("mqtt",j);
-
-
+                    bindings.put("mqtt", j);
                 }
                 json.put("bindings", bindings);
             }
+
         }
         if (channel.parameters().length > 0) {
             JSONObject parametersjson = new JSONObject();
