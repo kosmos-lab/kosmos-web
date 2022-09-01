@@ -3,73 +3,25 @@
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     <id>zip</id>
     <includeBaseDirectory>false</includeBaseDirectory>
-
     <formats>
         <format>zip</format>
     </formats>
     <fileSets>
-
-        <fileSet>
-            <directory>${project.basedir}/config</directory>
-            <excludes>
-                <exclude>**/.idea/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/docker/ha/config/custom_components/kosmos</directory>
-            <excludes>
-                <exclude>**/__pycache__/**</exclude>
-                <exclude>**/.idea/**</exclude>
-                <exclude>**/venv/**</exclude>
-            </excludes>
-        </fileSet>
-
-        <fileSet>
-            <directory>${project.basedir}/web</directory>
-            <includes>
-
-                <include>**/oz/**</include>
-                <include>**/kree/**</include>
-                <include>**/js/**</include>
-                <include>**/css/**</include>
-                <include>**/doc/**</include>
-                <include>**/live.html</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/schema</directory>
-            <excludes>
-
-                <exclude>**/.idea/**</exclude>
-
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/rules</directory>
-            <includes>
-                <include>**/kosmos.py</include>
-                <include>**/requirements.txt</include>
-            </includes>
-        </fileSet>
         <fileSet>
             <directory>${project.basedir}/target/lib</directory>
             <excludes>
-
                 <exclude>**/.idea/**</exclude>
                 <exclude>**/__pycache__/**</exclude>
                 <exclude>**/web/**</exclude>
                 <exclude>**/doc/**</exclude>
-
             </excludes>
         </fileSet>
     </fileSets>
     <files>
         <file>
             <source>${project.build.directory}/${finalName}.jar</source>
-            <destName>kosmos.jar</destName>
-
+            <destName>web.jar</destName>
             <outputDirectory>target</outputDirectory>
         </file>
     </files>
-
 </assembly>
