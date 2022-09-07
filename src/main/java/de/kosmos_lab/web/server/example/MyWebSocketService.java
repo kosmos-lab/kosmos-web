@@ -30,13 +30,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Message(
         name = "ping",
-        payloadRefs = {
-                "#/components/schemas/ping"}
+        payloadSchema = @Schema(ref=
+                "#/components/schemas/ping")
 )
 @Message(
         name = "auth",
-        payloadRefs = {
-                "#/components/schemas/auth"}
+        payloadSchema = @Schema(ref=
+                "#/components/schemas/auth")
 )
 @ObjectSchema(
         componentName = "auth",

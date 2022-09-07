@@ -19,7 +19,6 @@ import java.lang.annotation.Target;
 public @interface Message {
 
 
-
     Header[] headers() default {};
 
     String contentType() default "application/json";
@@ -38,13 +37,13 @@ public @interface Message {
 
     ExampleObject[] examples() default {};
 
-    String[] payloadRefs() default {};
-    String[] xResponseRefs() default {};
     ObjectSchema payload() default @ObjectSchema;
+
     ObjectSchema xResponse() default @ObjectSchema;
 
-    Schema payloadSchema() default @Schema;
-    Schema xResponseSchema() default @Schema;
+    Schema[] payloadSchema() default {};
+
+    Schema[] xResponseSchema() default {};
 
 
 }

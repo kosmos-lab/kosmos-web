@@ -131,7 +131,7 @@ public class BaseServlet extends HttpServlet {
     }
 
     public void handleException(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        logger.warn("got exception {}",e.getMessage(),e);
+        //logger.warn("got exception {}",e.getMessage(),e);
         if (e instanceof de.kosmos_lab.web.exceptions.ServletException) {
             ApiResponse r = e.getClass().getAnnotation(ApiResponse.class);
             if (r != null && r.responseCode() != null) {
@@ -141,6 +141,7 @@ public class BaseServlet extends HttpServlet {
             }
             try {
                 response.getWriter().print(e.getMessage());
+                return;
             } catch (IOException ex) {
                 //throw new RuntimeException(ex);
                 logger.error("error while writing error message", ex);
@@ -149,6 +150,7 @@ public class BaseServlet extends HttpServlet {
             response.setStatus(de.kosmos_lab.web.server.WebServer.STATUS_UNPROCESSABLE);
             try {
                 response.getWriter().print(e.getMessage());
+                return;
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -165,15 +167,18 @@ public class BaseServlet extends HttpServlet {
                 response.setStatus(r.responseCode().statusCode());
             } else {
                 response.setStatus(de.kosmos_lab.web.server.WebServer.STATUS_ERROR);
+
             }
             try {
                 response.getWriter().print(e.getMessage());
+                return;
             } catch (IOException ex) {
                 //throw new RuntimeException(ex);
                 logger.error("error while writing error message", ex);
             }
 
         }
+        logger.warn("got unexpected exception {}",e.getMessage(),e);
     }
 
     protected boolean checkParameter(HttpServletRequest req, HttpServletResponse response, String[] keys) throws IOException {

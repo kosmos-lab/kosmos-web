@@ -241,7 +241,7 @@ public class AsyncApiParser extends OpenApiParser {
         JSONArray examplesArray = getExamplesArray(message.examples());
 
         //JSONArray payload = new JSONArray();
-        if (message.payloadRefs().length == 1) {
+        /*if (message.payloadRefs().length == 1) {
             //payload.put("$ref",message.payloadRef());
             payloads.put(new JSONObject().put("$ref", message.payloadRefs()[0]));
         }
@@ -253,7 +253,7 @@ public class AsyncApiParser extends OpenApiParser {
                 //json.put("payload", new JSONObject().put("$ref",message.payloadRefs()));
             }
 
-        }
+        }*/
         if (message.payload().properties().length > 0) {
             JSONObject j = toJSON(message.payload());
             add("examples", getExamplesArray(message.payload().examples()), j);
@@ -267,7 +267,7 @@ public class AsyncApiParser extends OpenApiParser {
             add("examples", getExamplesArray(message.xResponse().examples()), j);
             responses.put(j);
         }
-        if (message.xResponseRefs().length == 1) {
+        /*if (message.xResponseRefs().length == 1) {
             //payload.put("$ref",message.payloadRef());
             responses.put(new JSONObject().put("$ref", message.xResponseRefs()[0]));
         }
@@ -275,18 +275,28 @@ public class AsyncApiParser extends OpenApiParser {
             for (String r : message.xResponseRefs()) {
                 responses.put(new JSONObject().put("$ref", r));
             }
-        }
-        if (message.payloadSchema().type() != SchemaType.DEFAULT) {
-            JSONObject j = toJSON(message.payloadSchema());
-            add("examples", getExamplesArray(message.payloadSchema().examples()), j);
+        }*/
+        for (Schema s : message.payloadSchema()) {
+            if (s.ref().length() > 0) {
+                payloads.put(new JSONObject().put("$ref", s.ref()));
 
-            payloads.put(j);
-        }
-        if (message.xResponseSchema().type() != SchemaType.DEFAULT) {
-            JSONObject j = toJSON(message.xResponseSchema());
-            add("examples", getExamplesArray(message.xResponseSchema().examples()), j);
 
-            responses.put(j);
+            } else if (s.type() != SchemaType.DEFAULT) {
+                JSONObject j = toJSON(s);
+                add("examples", getExamplesArray(s.examples()), j);
+
+                payloads.put(j);
+            }
+        }
+        for (Schema s : message.xResponseSchema()) {
+
+            if (s.ref().length() > 0) {
+                responses.put(new JSONObject().put("$ref", s.ref()));
+            } else if (s.type() != SchemaType.DEFAULT) {
+                JSONObject j = toJSON(s);
+                add("examples", getExamplesArray(s.examples()), j);
+                responses.put(j);
+            }
         }
         if (payloads.length() == 1) {
             json.put("payload", payloads.get(0));
