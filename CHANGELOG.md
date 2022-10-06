@@ -1,5 +1,8 @@
 # Changelog
-
+## v0.1.3.6
+* updated some dependencies
+* removed netty core dependency
+* 
 ## v0.1.3.5
 * minor fixes
 * added async.css

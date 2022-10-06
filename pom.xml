@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.kosmos-lab</groupId>
-    <version>0.1.3.5</version>
+    <version>0.1.3.6</version>
     <artifactId>web</artifactId>
     <name>kosmos-web</name>
     <description>The KosmoS Platform</description>
@@ -157,7 +157,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.13.3</version>
+            <version>2.14.0-rc1</version>
         </dependency>
 
 
@@ -280,7 +280,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20160810</version>
+            <version>20220924</version>
         </dependency>
         <dependency>
             <groupId>de.kosmos-lab</groupId>
@@ -289,11 +289,6 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-common</artifactId>
-            <version>4.1.22.Final</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>

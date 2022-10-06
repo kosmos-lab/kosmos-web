@@ -1,7 +1,6 @@
 package de.kosmos_lab.web.server;
 
 import de.kosmos_lab.web.server.example.MyWebSocketService;
-import io.netty.util.internal.ConcurrentSet;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -9,6 +8,7 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Interface for all WebSocket Services
@@ -16,7 +16,7 @@ import java.util.Set;
 public abstract  class WebSocketService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(WebSocketService.class);
 
-    protected  ConcurrentSet<Session> sessions = new ConcurrentSet<>();
+    protected  Set<Session> sessions = ConcurrentHashMap.newKeySet();
     protected final WebServer server;
 
     public WebSocketService(WebServer server) {
