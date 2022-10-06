@@ -207,7 +207,7 @@ public class BaseServlet extends HttpServlet {
 
     }
 
-    public void delete(BaseServletRequest request, HttpServletResponse response) throws ServletException {
+    public void delete(BaseServletRequest request, HttpServletResponse response) throws Exception {
 
         response.setStatus(de.kosmos_lab.web.server.WebServer.STATUS_METHOD_NOT_ALLOWED);
     }

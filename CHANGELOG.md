@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.1.3.5
+* minor fixes
+* added async.css
+* added option to add custom examples from a json file
+* fixed AlreadyExistsException
+
+
+## v0.1.3.4
+* fixed throws list for BaseServlet.delete
+
 ## v0.1.3.4
 * fixed issue with schemas refs not working as wanted
 * Moved websocket testclient used for testing to module

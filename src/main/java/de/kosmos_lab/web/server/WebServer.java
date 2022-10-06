@@ -85,6 +85,21 @@ public abstract class WebServer {
     protected boolean stopped = false;
     HashSet<Class<? extends Exception>> thrown = new HashSet<>();
     private File configFile;
+    private OpenApiParser openApiParser;
+
+    public OpenApiParser getOpenApiParser() {
+        return openApiParser;
+    }
+
+
+
+    public AsyncApiParser getAsyncApiParser() {
+        return asyncApiParser;
+    }
+
+
+
+    private AsyncApiParser asyncApiParser;
 
     public WebServer(File configFile, boolean testing) throws Exception {
         if (configFile == null) {
@@ -171,10 +186,13 @@ public abstract class WebServer {
 
 
         handlers.addHandler(context);
-
+        
         server.setHandler(handlers);
         //OpenApiParser.create(this.loadedServlets);
         loadResources();
+        openApiParser = new OpenApiParser(this);
+        asyncApiParser = new AsyncApiParser(this);
+
         server.start();
         //server.dump(System.err);
 
@@ -475,6 +493,7 @@ public abstract class WebServer {
         ServerConnector connector = new ServerConnector(server);
         this.port = webserverConfig.getInt("port");
         connector.setPort(port);
+        connector.setHost(webserverConfig.optString("host","0.0.0.0"));
         server.addConnector(connector);
         this.handlers = new ContextHandlerCollection();
 

@@ -2,6 +2,7 @@ package de.kosmos_lab.web.server;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import de.kosmos_lab.utils.KosmosFileUtils;
 import de.kosmos_lab.web.annotations.Parameter;
 import de.kosmos_lab.web.annotations.enums.SchemaType;
 import de.kosmos_lab.web.annotations.info.AsyncInfo;
@@ -20,6 +21,7 @@ import org.json.JSONObject;
 import org.reflections.Reflections;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +45,16 @@ public class AsyncApiParser extends OpenApiParser {
 
     public AsyncApiParser(WebServer server) {
         super(server);
+        File exampleFile = new File("config/examples-asyncapi.json");
+        this.injectedExamples = null;
+        if (exampleFile.exists()) {
+            try {
+                this.injectedExamples = new JSONObject(KosmosFileUtils.readFile(exampleFile));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
     }
 
     public synchronized JSONObject getJSON() {

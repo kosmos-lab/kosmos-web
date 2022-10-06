@@ -4,6 +4,7 @@ import de.kosmos_lab.web.annotations.Operation;
 import de.kosmos_lab.web.annotations.responses.ApiResponse;
 import de.kosmos_lab.web.doc.openapi.ApiEndpoint;
 import de.kosmos_lab.web.doc.openapi.ResponseCode;
+import de.kosmos_lab.web.exceptions.ParameterNotFoundException;
 import de.kosmos_lab.web.server.AsyncApiParser;
 import de.kosmos_lab.web.server.WebServer;
 import de.kosmos_lab.web.server.servlets.BaseServlet;
@@ -15,14 +16,10 @@ import java.io.IOException;
 
 @ApiEndpoint(path = "/doc/asyncapi.yaml", userLevel = -1)
 public class AsyncApiYamlServlet extends BaseServlet {
-    static AsyncApiParser parser = null;
-    public String cached = null;
 
     public AsyncApiYamlServlet(WebServer webServer) {
         super(webServer);
-        if (parser == null) {
-            parser = new AsyncApiParser(webServer);
-        }
+
 
     }
 
@@ -37,25 +34,28 @@ public class AsyncApiYamlServlet extends BaseServlet {
     @Override
     public void get(BaseServletRequest request, HttpServletResponse response)
             throws IOException {
-        if (cached == null) {
 
-
-            cached = parser.getYAML();
-
-        }
 
         String host = null;
         try {
-            host = request.getRequest().getHeader("host");
-        } catch (Exception ex ) {
+            host = request.getParameter("host",false);
+        } catch (ParameterNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        if ( host == null ) {
+            try {
+                host = request.getRequest().getHeader("host");
+            } catch (Exception ex) {
 
+            }
         }
         if ( host != null ) {
-            sendText(request, response, server.replaceHostName(cached,host));
+            sendTextAs(request, response, server.replaceHostName(server.getAsyncApiParser().getCachedYAML(),host),"text/x-yaml");
 
         }
         else {
-            sendText(request, response, cached);
+            sendTextAs(request, response, server.getAsyncApiParser().getCachedYAML(),"text/x-yaml");
+
         }
 
 

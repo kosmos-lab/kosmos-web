@@ -1,0 +1,6382 @@
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* Default standalone editor fonts */
+
+.monaco-editor {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "HelveticaNeue-Light", system-ui, "Ubuntu", "Droid Sans", sans-serif;
+    --monaco-monospace-font: "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
+}
+
+.monaco-menu .monaco-action-bar.vertical .action-item .action-menu-item:focus .action-label {
+    stroke-width: 1.2px;
+}
+
+.monaco-editor.vs-dark .monaco-menu .monaco-action-bar.vertical .action-menu-item:focus .action-label,
+.monaco-editor.hc-black .monaco-menu .monaco-action-bar.vertical .action-menu-item:focus .action-label {
+    stroke-width: 1.2px;
+}
+
+.monaco-hover p {
+    margin: 0;
+}
+
+/* See https://github.com/microsoft/monaco-editor/issues/2168#issuecomment-780078600 */
+
+.monaco-aria-container {
+    position: absolute !important;
+    top: 0; /* avoid being placed underneath a sibling element */
+    height: 1px;
+    width: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    clip: rect(1px, 1px, 1px, 1px);
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+}
+
+/* The hc-black theme is already high contrast optimized */
+
+.monaco-editor.hc-black {
+    -ms-high-contrast-adjust: none;
+}
+
+/* In case the browser goes into high contrast mode and the editor is not configured with the hc-black theme */
+
+@media screen and (-ms-high-contrast:active) {
+    /* current line highlight */
+
+    .monaco-editor.vs .view-overlays .current-line,
+    .monaco-editor.vs-dark .view-overlays .current-line {
+        border-color: windowtext !important;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    /* view cursors */
+
+    .monaco-editor.vs .cursor,
+    .monaco-editor.vs-dark .cursor {
+        background-color: windowtext !important;
+    }
+
+    /* dnd target */
+
+    .monaco-editor.vs .dnd-target,
+    .monaco-editor.vs-dark .dnd-target {
+        border-color: windowtext !important;
+    }
+
+    /* selected text background */
+
+    .monaco-editor.vs .selected-text,
+    .monaco-editor.vs-dark .selected-text {
+        background-color: highlight !important;
+    }
+
+    /* allow the text to have a transparent background. */
+
+    .monaco-editor.vs .view-line,
+    .monaco-editor.vs-dark .view-line {
+        -ms-high-contrast-adjust: none;
+    }
+
+    /* text color */
+
+    .monaco-editor.vs .view-line span,
+    .monaco-editor.vs-dark .view-line span {
+        color: windowtext !important;
+    }
+
+    /* selected text color */
+
+    .monaco-editor.vs .view-line span.inline-selected-text,
+    .monaco-editor.vs-dark .view-line span.inline-selected-text {
+        color: highlighttext !important;
+    }
+
+    /* allow decorations */
+
+    .monaco-editor.vs .view-overlays,
+    .monaco-editor.vs-dark .view-overlays {
+        -ms-high-contrast-adjust: none;
+    }
+
+    /* various decorations */
+
+    .monaco-editor.vs .selectionHighlight,
+    .monaco-editor.vs-dark .selectionHighlight,
+    .monaco-editor.vs .wordHighlight,
+    .monaco-editor.vs-dark .wordHighlight,
+    .monaco-editor.vs .wordHighlightStrong,
+    .monaco-editor.vs-dark .wordHighlightStrong,
+    .monaco-editor.vs .reference-decoration,
+    .monaco-editor.vs-dark .reference-decoration {
+        border: 2px dotted highlight !important;
+        background: transparent !important;
+        box-sizing: border-box;
+    }
+
+    .monaco-editor.vs .rangeHighlight,
+    .monaco-editor.vs-dark .rangeHighlight {
+        background: transparent !important;
+        border: 1px dotted activeborder !important;
+        box-sizing: border-box;
+    }
+
+    .monaco-editor.vs .bracket-match,
+    .monaco-editor.vs-dark .bracket-match {
+        border-color: windowtext !important;
+        background: transparent !important;
+    }
+
+    /* find widget */
+
+    .monaco-editor.vs .findMatch,
+    .monaco-editor.vs-dark .findMatch,
+    .monaco-editor.vs .currentFindMatch,
+    .monaco-editor.vs-dark .currentFindMatch {
+        border: 2px dotted activeborder !important;
+        background: transparent !important;
+        box-sizing: border-box;
+    }
+
+    .monaco-editor.vs .find-widget,
+    .monaco-editor.vs-dark .find-widget {
+        border: 1px solid windowtext;
+    }
+
+    /* list - used by suggest widget */
+
+    .monaco-editor.vs .monaco-list .monaco-list-row,
+    .monaco-editor.vs-dark .monaco-list .monaco-list-row {
+        -ms-high-contrast-adjust: none;
+        color: windowtext !important;
+    }
+
+    .monaco-editor.vs .monaco-list .monaco-list-row.focused,
+    .monaco-editor.vs-dark .monaco-list .monaco-list-row.focused {
+        color: highlighttext !important;
+        background-color: highlight !important;
+    }
+
+    .monaco-editor.vs .monaco-list .monaco-list-row:hover,
+    .monaco-editor.vs-dark .monaco-list .monaco-list-row:hover {
+        background: transparent !important;
+        border: 1px solid highlight;
+        box-sizing: border-box;
+    }
+
+    /* scrollbars */
+
+    .monaco-editor.vs .monaco-scrollable-element > .scrollbar,
+    .monaco-editor.vs-dark .monaco-scrollable-element > .scrollbar {
+        -ms-high-contrast-adjust: none;
+        background: background !important;
+        border: 1px solid windowtext;
+        box-sizing: border-box;
+    }
+
+    .monaco-editor.vs .monaco-scrollable-element > .scrollbar > .slider,
+    .monaco-editor.vs-dark .monaco-scrollable-element > .scrollbar > .slider {
+        background: windowtext !important;
+    }
+
+    .monaco-editor.vs .monaco-scrollable-element > .scrollbar > .slider:hover,
+    .monaco-editor.vs-dark .monaco-scrollable-element > .scrollbar > .slider:hover {
+        background: highlight !important;
+    }
+
+    .monaco-editor.vs .monaco-scrollable-element > .scrollbar > .slider.active,
+    .monaco-editor.vs-dark .monaco-scrollable-element > .scrollbar > .slider.active {
+        background: highlight !important;
+    }
+
+    /* overview ruler */
+
+    .monaco-editor.vs .decorationsOverviewRuler,
+    .monaco-editor.vs-dark .decorationsOverviewRuler {
+        opacity: 0;
+    }
+
+    /* minimap */
+
+    .monaco-editor.vs .minimap,
+    .monaco-editor.vs-dark .minimap {
+        display: none;
+    }
+
+    /* squiggles */
+
+    .monaco-editor.vs .squiggly-d-error,
+    .monaco-editor.vs-dark .squiggly-d-error {
+        background: transparent !important;
+        border-bottom: 4px double #E47777;
+    }
+
+    .monaco-editor.vs .squiggly-c-warning,
+    .monaco-editor.vs-dark .squiggly-c-warning {
+        border-bottom: 4px double #71B771;
+    }
+
+    .monaco-editor.vs .squiggly-b-info,
+    .monaco-editor.vs-dark .squiggly-b-info {
+        border-bottom: 4px double #71B771;
+    }
+
+    .monaco-editor.vs .squiggly-a-hint,
+    .monaco-editor.vs-dark .squiggly-a-hint {
+        border-bottom: 4px double #6c6c6c;
+    }
+
+    /* contextmenu */
+
+    .monaco-editor.vs .monaco-menu .monaco-action-bar.vertical .action-menu-item:focus .action-label,
+    .monaco-editor.vs-dark .monaco-menu .monaco-action-bar.vertical .action-menu-item:focus .action-label {
+        -ms-high-contrast-adjust: none;
+        color: highlighttext !important;
+        background-color: highlight !important;
+    }
+
+    .monaco-editor.vs .monaco-menu .monaco-action-bar.vertical .action-menu-item:hover .action-label,
+    .monaco-editor.vs-dark .monaco-menu .monaco-action-bar.vertical .action-menu-item:hover .action-label {
+        -ms-high-contrast-adjust: none;
+        background: transparent !important;
+        border: 1px solid highlight;
+        box-sizing: border-box;
+    }
+
+    /* diff editor */
+
+    .monaco-diff-editor.vs .diffOverviewRuler,
+    .monaco-diff-editor.vs-dark .diffOverviewRuler {
+        display: none;
+    }
+
+    .monaco-editor.vs .line-insert,
+    .monaco-editor.vs-dark .line-insert,
+    .monaco-editor.vs .line-delete,
+    .monaco-editor.vs-dark .line-delete {
+        background: transparent !important;
+        border: 1px solid highlight !important;
+        box-sizing: border-box;
+    }
+
+    .monaco-editor.vs .char-insert,
+    .monaco-editor.vs-dark .char-insert,
+    .monaco-editor.vs .char-delete,
+    .monaco-editor.vs-dark .char-delete {
+        background: transparent !important;
+    }
+}
+
+/*.monaco-editor.vs [tabindex="0"]:focus {
+	outline: 1px solid rgba(0, 122, 204, 0.4);
+	outline-offset: -1px;
+	opacity: 1 !important;
+}
+
+.monaco-editor.vs-dark [tabindex="0"]:focus {
+	outline: 1px solid rgba(14, 99, 156, 0.6);
+	outline-offset: -1px;
+	opacity: 1 !important;
+}*/
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-aria-container {
+    position: absolute; /* try to hide from window but not from screen readers */
+    left:-999em;
+}
+
+/*purgecss end ignore*/
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* -------------------- IE10 remove auto clear button -------------------- */
+
+::-ms-clear {
+    display: none;
+}
+
+/* All widgets */
+
+/* I am not a big fan of this rule */
+
+.monaco-editor .editor-widget input {
+    color: inherit;
+}
+
+/* -------------------- Editor -------------------- */
+
+.monaco-editor {
+    position: relative;
+    overflow: visible;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* -------------------- Misc -------------------- */
+
+.monaco-editor .overflow-guard {
+    position: relative;
+    overflow: hidden;
+}
+
+.monaco-editor .view-overlays {
+    position: absolute;
+    top: 0;
+}
+
+/*
+.monaco-editor .auto-closed-character {
+	opacity: 0.3;
+}
+*/
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .inputarea {
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    outline: none !important;
+    resize: none;
+    border: none;
+    overflow: hidden;
+    color: transparent;
+    background-color: transparent;
+}
+
+/*.monaco-editor .inputarea {
+	position: fixed !important;
+	width: 800px !important;
+	height: 500px !important;
+	top: initial !important;
+	left: initial !important;
+	bottom: 0 !important;
+	right: 0 !important;
+	color: black !important;
+	background: white !important;
+	line-height: 15px !important;
+	font-size: 14px !important;
+}*/
+
+.monaco-editor .inputarea.ime-input {
+    z-index: 10;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .margin-view-overlays .line-numbers {
+    -webkit-font-feature-settings: "tnum";
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+    position: absolute;
+    text-align: right;
+    display: inline-block;
+    vertical-align: middle;
+    box-sizing: border-box;
+    cursor: default;
+    height: 100%;
+}
+
+.monaco-editor .relative-current-line-number {
+    text-align: left;
+    display: inline-block;
+    width: 100%;
+}
+
+.monaco-editor .margin-view-overlays .line-numbers.lh-odd {
+    margin-top: 1px;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-mouse-cursor-text {
+    cursor: text;
+}
+
+/* The following selector looks a bit funny, but that is needed to cover all the workbench and the editor!! */
+
+.vs-dark .mac .monaco-mouse-cursor-text, .hc-black .mac .monaco-mouse-cursor-text,
+.vs-dark.mac .monaco-mouse-cursor-text, .hc-black.mac .monaco-mouse-cursor-text {
+    cursor: -webkit-image-set(url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=) 1x, url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAAz0lEQVRIx2NgYGBY/R8I/vx5eelX3n82IJ9FxGf6tksvf/8FiTMQAcAGQMDvSwu09abffY8QYSAScNk45G198eX//yev73/4///701eh//kZSARckrNBRvz//+8+6ZohwCzjGNjdgQxkAg7B9WADeBjIBqtJCbhRA0YNoIkBSNmaPEMoNmA0FkYNoFKhapJ6FGyAH3nauaSmPfwI0v/3OukVi0CIZ+F25KrtYcx/CTIy0e+rC7R1Z4KMICVTQQ14feVXIbR695u14+Ir4gwAAD49E54wc1kWAAAAAElFTkSuQmCC) 2x) 5 8, text;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .view-overlays .current-line {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+}
+
+.monaco-editor .margin-view-overlays .current-line {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+}
+
+.monaco-editor .margin-view-overlays .current-line.current-line-margin.current-line-margin-both {
+    border-right: 0;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/*
+	Keeping name short for faster parsing.
+	cdr = core decorations rendering (div)
+*/
+
+.monaco-editor .lines-content .cdr {
+    position: absolute;
+}
+
+/*purgecss end ignore*/
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* Arrows */
+
+.monaco-scrollable-element > .scrollbar > .scra {
+    cursor: pointer;
+    font-size: 11px !important;
+}
+
+.monaco-scrollable-element > .visible {
+    opacity: 1;
+    /* Background rule added for IE9 - to allow clicks on dom node */
+    background:rgba(0,0,0,0);
+    transition: opacity 100ms linear;
+}
+
+.monaco-scrollable-element > .invisible {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.monaco-scrollable-element > .invisible.fade {
+    transition: opacity 800ms linear;
+}
+
+/* Scrollable Content Inset Shadow */
+
+.monaco-scrollable-element > .shadow {
+    position: absolute;
+    display: none;
+}
+
+.monaco-scrollable-element > .shadow.top {
+    display: block;
+    top: 0;
+    left: 3px;
+    height: 3px;
+    width: 100%;
+    box-shadow: #DDD 0 6px 6px -6px inset;
+}
+
+.monaco-scrollable-element > .shadow.left {
+    display: block;
+    top: 3px;
+    left: 0;
+    height: 100%;
+    width: 3px;
+    box-shadow: #DDD 6px 0 6px -6px inset;
+}
+
+.monaco-scrollable-element > .shadow.top-left-corner {
+    display: block;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 3px;
+}
+
+.monaco-scrollable-element > .shadow.top.left {
+    box-shadow: #DDD 6px 6px 6px -6px inset;
+}
+
+/* ---------- Default Style ---------- */
+
+.vs .monaco-scrollable-element > .scrollbar > .slider {
+    background: rgba(100, 100, 100, .4);
+}
+
+.vs-dark .monaco-scrollable-element > .scrollbar > .slider {
+    background: rgba(121, 121, 121, .4);
+}
+
+.hc-black .monaco-scrollable-element > .scrollbar > .slider {
+    background: rgba(111, 195, 223, .6);
+}
+
+.monaco-scrollable-element > .scrollbar > .slider:hover {
+    background: rgba(100, 100, 100, .7);
+}
+
+.hc-black .monaco-scrollable-element > .scrollbar > .slider:hover {
+    background: rgba(111, 195, 223, .8);
+}
+
+.monaco-scrollable-element > .scrollbar > .slider.active {
+    background: rgba(0, 0, 0, .6);
+}
+
+.vs-dark .monaco-scrollable-element > .scrollbar > .slider.active {
+    background: rgba(191, 191, 191, .4);
+}
+
+.hc-black .monaco-scrollable-element > .scrollbar > .slider.active {
+    background: rgba(111, 195, 223, 1);
+}
+
+.vs-dark .monaco-scrollable-element .shadow.top {
+    box-shadow: none;
+}
+
+.vs-dark .monaco-scrollable-element .shadow.left {
+    box-shadow: #000 6px 0 6px -6px inset;
+}
+
+.vs-dark .monaco-scrollable-element .shadow.top.left {
+    box-shadow: #000 6px 6px 6px -6px inset;
+}
+
+.hc-black .monaco-scrollable-element .shadow.top {
+    box-shadow: none;
+}
+
+.hc-black .monaco-scrollable-element .shadow.left {
+    box-shadow: none;
+}
+
+.hc-black .monaco-scrollable-element .shadow.top.left {
+    box-shadow: none;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .glyph-margin {
+    position: absolute;
+    top: 0;
+}
+
+/*
+	Keeping name short for faster parsing.
+	cgmr = core glyph margin rendering (div)
+*/
+
+.monaco-editor .margin-view-overlays .cgmr {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/*
+	Keeping name short for faster parsing.
+	cigr = core ident guides rendering (div)
+*/
+
+.monaco-editor .lines-content .cigr {
+    position: absolute;
+}
+
+.monaco-editor .lines-content .cigra {
+    position: absolute;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* Uncomment to see lines flashing when they're painted */
+
+/*.monaco-editor .view-lines > .view-line {
+	background-color: none;
+	animation-name: flash-background;
+	animation-duration: 800ms;
+}
+@keyframes flash-background {
+	0%   { background-color: lightgreen; }
+	100% { background-color: none }
+}*/
+
+.monaco-editor.no-user-select .lines-content,
+.monaco-editor.no-user-select .view-line,
+.monaco-editor.no-user-select .view-lines {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.monaco-editor .view-lines {
+    white-space: nowrap;
+}
+
+.monaco-editor .view-line {
+    position: absolute;
+    width: 100%;
+}
+
+.monaco-editor .mtkz {
+    display: inline-block;
+}
+
+/* TODO@tokenization bootstrap fix */
+
+/*.monaco-editor .view-line > span > span {
+	float: none;
+	min-height: inherit;
+	margin-left: inherit;
+}*/
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .lines-decorations {
+    position: absolute;
+    top: 0;
+    background: white;
+}
+
+/*
+	Keeping name short for faster parsing.
+	cldr = core lines decorations rendering (div)
+*/
+
+.monaco-editor .margin-view-overlays .cldr {
+    position: absolute;
+    height: 100%;
+}
+
+/*purgecss end ignore*/
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/*
+	Keeping name short for faster parsing.
+	cmdr = core margin decorations rendering (div)
+*/
+
+.monaco-editor .margin-view-overlays .cmdr {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/*purgecss end ignore*/
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* START cover the case that slider is visible on mouseover */
+
+.monaco-editor .minimap.slider-mouseover .minimap-slider {
+    opacity: 0;
+    transition: opacity 100ms linear;
+}
+
+.monaco-editor .minimap.slider-mouseover:hover .minimap-slider {
+    opacity: 1;
+}
+
+.monaco-editor .minimap.slider-mouseover .minimap-slider.active {
+    opacity: 1;
+}
+
+/* END cover the case that slider is visible on mouseover */
+
+.monaco-editor .minimap-shadow-hidden {
+    position: absolute;
+    width: 0;
+}
+
+.monaco-editor .minimap-shadow-visible {
+    position: absolute;
+    left: -6px;
+    width: 6px;
+}
+
+.monaco-editor.no-minimap-shadow .minimap-shadow-visible {
+    position: absolute;
+    left: -1px;
+    width: 1px;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .overlayWidgets {
+    position: absolute;
+    top: 0;
+    left:0;
+}
+
+/*purgecss end ignore*/
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .view-ruler {
+    position: absolute;
+    top: 0;
+}
+
+/*purgecss end ignore*/
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .scroll-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 6px;
+}
+
+/*purgecss end ignore*/
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/*
+	Keeping name short for faster parsing.
+	cslr = core selections layer rendering (div)
+*/
+
+.monaco-editor .lines-content .cslr {
+    position: absolute;
+}
+
+.monaco-editor			.top-left-radius		{ border-top-left-radius: 3px;
+}
+
+.monaco-editor			.bottom-left-radius		{ border-bottom-left-radius: 3px;
+}
+
+.monaco-editor			.top-right-radius		{ border-top-right-radius: 3px;
+}
+
+.monaco-editor			.bottom-right-radius	{ border-bottom-right-radius: 3px;
+}
+
+.monaco-editor.hc-black .top-left-radius		{ border-top-left-radius: 0;
+}
+
+.monaco-editor.hc-black .bottom-left-radius		{ border-bottom-left-radius: 0;
+}
+
+.monaco-editor.hc-black .top-right-radius		{ border-top-right-radius: 0;
+}
+
+.monaco-editor.hc-black .bottom-right-radius	{ border-bottom-right-radius: 0;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-editor .cursors-layer {
+    position: absolute;
+    top: 0;
+}
+
+.monaco-editor .cursors-layer > .cursor {
+    position: absolute;
+    overflow: hidden;
+}
+
+/* -- smooth-caret-animation -- */
+
+.monaco-editor .cursors-layer.cursor-smooth-caret-animation > .cursor {
+    transition: all 80ms;
+}
+
+/* -- block-outline-style -- */
+
+.monaco-editor .cursors-layer.cursor-block-outline-style > .cursor {
+    box-sizing: border-box;
+    background: transparent !important;
+    border-style: solid;
+    border-width: 1px;
+}
+
+/* -- underline-style -- */
+
+.monaco-editor .cursors-layer.cursor-underline-style > .cursor {
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+    background: transparent !important;
+    box-sizing: border-box;
+}
+
+/* -- underline-thin-style -- */
+
+.monaco-editor .cursors-layer.cursor-underline-thin-style > .cursor {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    background: transparent !important;
+    box-sizing: border-box;
+}
+
+@-webkit-keyframes monaco-cursor-smooth {
+    0%,
+    20% {
+        opacity: 1;
+    }
+
+    60%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes monaco-cursor-smooth {
+    0%,
+    20% {
+        opacity: 1;
+    }
+
+    60%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes monaco-cursor-phase {
+    0%,
+    20% {
+        opacity: 1;
+    }
+
+    90%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes monaco-cursor-phase {
+    0%,
+    20% {
+        opacity: 1;
+    }
+
+    90%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes monaco-cursor-expand {
+    0%,
+    20% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+    }
+
+    80%,
+    100% {
+        -webkit-transform: scaleY(0);
+        transform: scaleY(0);
+    }
+}
+
+@keyframes monaco-cursor-expand {
+    0%,
+    20% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+    }
+
+    80%,
+    100% {
+        -webkit-transform: scaleY(0);
+        transform: scaleY(0);
+    }
+}
+
+.cursor-smooth {
+    -webkit-animation: monaco-cursor-smooth 0.5s ease-in-out 0s 20 alternate;
+    animation: monaco-cursor-smooth 0.5s ease-in-out 0s 20 alternate;
+}
+
+.cursor-phase {
+    -webkit-animation: monaco-cursor-phase 0.5s ease-in-out 0s 20 alternate;
+    animation: monaco-cursor-phase 0.5s ease-in-out 0s 20 alternate;
+}
+
+.cursor-expand > .cursor {
+    -webkit-animation: monaco-cursor-expand 0.5s ease-in-out 0s 20 alternate;
+    animation: monaco-cursor-expand 0.5s ease-in-out 0s 20 alternate;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* ---------- DiffEditor ---------- */
+
+.monaco-diff-editor .diffOverview {
+    z-index: 9;
+}
+
+.monaco-diff-editor .diffOverview .diffViewport {
+    z-index: 10;
+}
+
+/* colors not externalized: using transparancy on background */
+
+.monaco-diff-editor.vs			.diffOverview { background: rgba(0, 0, 0, 0.03);
+}
+
+.monaco-diff-editor.vs-dark		.diffOverview { background: rgba(255, 255, 255, 0.01);
+}
+
+.monaco-scrollable-element.modified-in-monaco-diff-editor.vs		.scrollbar { background: rgba(0,0,0,0);
+}
+
+.monaco-scrollable-element.modified-in-monaco-diff-editor.vs-dark	.scrollbar { background: rgba(0,0,0,0);
+}
+
+.monaco-scrollable-element.modified-in-monaco-diff-editor.hc-black	.scrollbar { background: none;
+}
+
+.monaco-scrollable-element.modified-in-monaco-diff-editor .slider {
+    z-index: 10;
+}
+
+.modified-in-monaco-diff-editor				.slider.active { background: rgba(171, 171, 171, .4);
+}
+
+.modified-in-monaco-diff-editor.hc-black	.slider.active { background: none;
+}
+
+/* ---------- Diff ---------- */
+
+.monaco-editor .insert-sign,
+.monaco-diff-editor .insert-sign,
+.monaco-editor .delete-sign,
+.monaco-diff-editor .delete-sign {
+    font-size: 11px !important;
+    opacity: 0.7 !important;
+    display: flex !important;
+    align-items: center;
+}
+
+.monaco-editor.hc-black .insert-sign,
+.monaco-diff-editor.hc-black .insert-sign,
+.monaco-editor.hc-black .delete-sign,
+.monaco-diff-editor.hc-black .delete-sign {
+    opacity: 1;
+}
+
+.monaco-editor .inline-deleted-margin-view-zone {
+    text-align: right;
+}
+
+.monaco-editor .inline-added-margin-view-zone {
+    text-align: right;
+}
+
+/* ---------- Inline Diff ---------- */
+
+.monaco-editor .view-zones .view-lines .view-line span {
+    display: inline-block;
+}
+
+.monaco-editor .margin-view-zones .lightbulb-glyph:hover {
+    cursor: pointer;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+:root {
+    --sash-size: 4px;
+}
+
+.monaco-sash {
+    position: absolute;
+    z-index: 35;
+    touch-action: none;
+}
+
+.monaco-sash.disabled {
+    pointer-events: none;
+}
+
+.monaco-sash.mac.vertical {
+    cursor: col-resize;
+}
+
+.monaco-sash.vertical.minimum {
+    cursor: e-resize;
+}
+
+.monaco-sash.vertical.maximum {
+    cursor: w-resize;
+}
+
+.monaco-sash.mac.horizontal {
+    cursor: row-resize;
+}
+
+.monaco-sash.horizontal.minimum {
+    cursor: s-resize;
+}
+
+.monaco-sash.horizontal.maximum {
+    cursor: n-resize;
+}
+
+.monaco-sash.disabled {
+    cursor: default !important;
+    pointer-events: none !important;
+}
+
+.monaco-sash.vertical {
+    cursor: ew-resize;
+    top: 0;
+    width: 4px;
+    width: var(--sash-size);
+    height: 100%;
+}
+
+.monaco-sash.horizontal {
+    cursor: ns-resize;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    height: var(--sash-size);
+}
+
+.monaco-sash:not(.disabled) > .orthogonal-drag-handle {
+    content: " ";
+    height: calc(4px * 2);
+    height: calc(var(--sash-size) * 2);
+    width: calc(4px * 2);
+    width: calc(var(--sash-size) * 2);
+    z-index: 100;
+    display: block;
+    cursor: all-scroll;
+    position: absolute;
+}
+
+.monaco-sash.horizontal.orthogonal-edge-north:not(.disabled)
+> .orthogonal-drag-handle.start,
+.monaco-sash.horizontal.orthogonal-edge-south:not(.disabled)
+> .orthogonal-drag-handle.end {
+    cursor: nwse-resize;
+}
+
+.monaco-sash.horizontal.orthogonal-edge-north:not(.disabled)
+> .orthogonal-drag-handle.end,
+.monaco-sash.horizontal.orthogonal-edge-south:not(.disabled)
+> .orthogonal-drag-handle.start {
+    cursor: nesw-resize;
+}
+
+.monaco-sash.vertical > .orthogonal-drag-handle.start {
+    left: calc(4px * -0.5);
+    left: calc(var(--sash-size) * -0.5);
+    top: calc(4px * -1);
+    top: calc(var(--sash-size) * -1);
+}
+
+.monaco-sash.vertical > .orthogonal-drag-handle.end {
+    left: calc(4px * -0.5);
+    left: calc(var(--sash-size) * -0.5);
+    bottom: calc(4px * -1);
+    bottom: calc(var(--sash-size) * -1);
+}
+
+.monaco-sash.horizontal > .orthogonal-drag-handle.start {
+    top: calc(4px * -0.5);
+    top: calc(var(--sash-size) * -0.5);
+    left: calc(4px * -1);
+    left: calc(var(--sash-size) * -1);
+}
+
+.monaco-sash.horizontal > .orthogonal-drag-handle.end {
+    top: calc(4px * -0.5);
+    top: calc(var(--sash-size) * -0.5);
+    right: calc(4px * -1);
+    right: calc(var(--sash-size) * -1);
+}
+
+.monaco-sash:before {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: background-color 0.1s ease-out;
+    background: transparent;
+}
+
+.monaco-sash.vertical:before {
+    width: var(--sash-hover-size);
+    left: calc(50% - (var(--sash-hover-size) / 2));
+}
+
+.monaco-sash.horizontal:before {
+    height: var(--sash-hover-size);
+    top: calc(50% - (var(--sash-hover-size) / 2));
+}
+
+/** Debug **/
+
+.monaco-sash.debug {
+    background: cyan;
+}
+
+.monaco-sash.debug.disabled {
+    background: rgba(0, 255, 255, 0.2);
+}
+
+.monaco-sash.debug:not(.disabled) > .orthogonal-drag-handle {
+    background: red;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-diff-editor .diff-review-line-number {
+    text-align: right;
+    display: inline-block;
+}
+
+.monaco-diff-editor .diff-review {
+    position: absolute;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.monaco-diff-editor .diff-review-summary {
+    padding-left: 10px;
+}
+
+.monaco-diff-editor .diff-review-shadow {
+    position: absolute;
+}
+
+.monaco-diff-editor .diff-review-row {
+    white-space: pre;
+}
+
+.monaco-diff-editor .diff-review-table {
+    display: table;
+    min-width: 100%;
+}
+
+.monaco-diff-editor .diff-review-row {
+    display: table-row;
+    width: 100%;
+}
+
+.monaco-diff-editor .diff-review-spacer {
+    display: inline-block;
+    width: 10px;
+    vertical-align: middle;
+}
+
+.monaco-diff-editor .diff-review-spacer > .codicon {
+    font-size: 9px !important;
+}
+
+.monaco-diff-editor .diff-review-actions {
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    top: 2px;
+}
+
+.monaco-diff-editor .diff-review-actions .action-label {
+    width: 16px;
+    height: 16px;
+    margin: 2px 0;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-action-bar {
+    white-space: nowrap;
+    height: 100%;
+}
+
+.monaco-action-bar .actions-container {
+    display: flex;
+    margin: 0 auto;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+}
+
+.monaco-action-bar.vertical .actions-container {
+    display: inline-block;
+}
+
+.monaco-action-bar .action-item {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;  /* DO NOT REMOVE - this is the key to preventing the ghosting icon bug in Chrome 42 */
+}
+
+.monaco-action-bar .action-item.disabled {
+    cursor: default;
+}
+
+.monaco-action-bar .action-item .icon,
+.monaco-action-bar .action-item .codicon {
+    display: block;
+}
+
+.monaco-action-bar .action-item .codicon {
+    display: flex;
+    align-items: center;
+    width: 16px;
+    height: 16px;
+}
+
+.monaco-action-bar .action-label {
+    font-size: 11px;
+    padding: 3px;
+    border-radius: 5px;
+}
+
+.monaco-action-bar .action-item.disabled .action-label,
+.monaco-action-bar .action-item.disabled .action-label::before,
+.monaco-action-bar .action-item.disabled .action-label:hover {
+    opacity: 0.4;
+}
+
+/* Vertical actions */
+
+.monaco-action-bar.vertical {
+    text-align: left;
+}
+
+.monaco-action-bar.vertical .action-item {
+    display: block;
+}
+
+.monaco-action-bar.vertical .action-label.separator {
+    display: block;
+    border-bottom: 1px solid #bbb;
+    padding-top: 1px;
+    margin-left: .8em;
+    margin-right: .8em;
+}
+
+.monaco-action-bar .action-item .action-label.separator {
+    width: 1px;
+    height: 16px;
+    margin: 5px 4px !important;
+    cursor: default;
+    min-width: 1px;
+    padding: 0;
+    background-color: #bbb;
+}
+
+.secondary-actions .monaco-action-bar .action-label {
+    margin-left: 6px;
+}
+
+/* Action Items */
+
+.monaco-action-bar .action-item.select-container {
+    overflow: hidden; /* somehow the dropdown overflows its container, we prevent it here to not push */
+    flex: 1 1;
+    max-width: 170px;
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.monaco-action-bar .action-item.action-dropdown-item {
+    display: flex;
+}
+
+.monaco-action-bar .action-item.action-dropdown-item > .action-label {
+    margin-right: 1px;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+@font-face {
+    font-family: "codicon";
+
+    font-display: block;
+
+    src: url(/async-studio/static/media/codicon.10273201.ttf) format("truetype");
+}
+
+.codicon[class*='codicon-'] {
+    font: normal normal normal 16px/1 codicon;
+    display: inline-block;
+    text-decoration: none;
+    text-rendering: auto;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+/* icon rules are dynamically created in codiconStyles */
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.codicon-wrench-subaction {
+    opacity: 0.5;
+}
+
+@-webkit-keyframes codicon-spin {
+    100% {
+        -webkit-transform:rotate(360deg);
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes codicon-spin {
+    100% {
+        -webkit-transform:rotate(360deg);
+        transform:rotate(360deg);
+    }
+}
+
+.codicon-sync.codicon-modifier-spin,
+.codicon-loading.codicon-modifier-spin,
+.codicon-gear.codicon-modifier-spin,
+.codicon-notebook-state-executing.codicon-modifier-spin {
+    /* Use steps to throttle FPS to reduce CPU usage */
+    -webkit-animation: codicon-spin 1.5s steps(30) infinite;
+    animation: codicon-spin 1.5s steps(30) infinite;
+}
+
+.codicon-modifier-disabled {
+    opacity: 0.4;
+}
+
+/* custom speed & easing for loading icon */
+
+.codicon-loading,
+.codicon-tree-item-loading::before {
+    -webkit-animation-duration: 1s !important;
+    animation-duration: 1s !important;
+    -webkit-animation-timing-function: cubic-bezier(0.53, 0.21, 0.29, 0.67) !important;
+    animation-timing-function: cubic-bezier(0.53, 0.21, 0.29, 0.67) !important;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.context-view {
+    position: absolute;
+    z-index: 2500;
+}
+
+.context-view.fixed {
+    all: initial;
+    font-family: inherit;
+    font-size: 13px;
+    position: fixed;
+    z-index: 2500;
+    color: inherit;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.context-view .monaco-menu {
+    min-width: 130px;
+}
+
+/*purgecss end ignore*/
+
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-list {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.monaco-list.mouse-support {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.monaco-list > .monaco-scrollable-element {
+    height: 100%;
+}
+
+.monaco-list-rows {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.monaco-list.horizontal-scrolling .monaco-list-rows {
+    width: auto;
+    min-width: 100%;
+}
+
+.monaco-list-row {
+    position: absolute;
+    box-sizing: border-box;
+    overflow: hidden;
+    width: 100%;
+}
+
+.monaco-list.mouse-support .monaco-list-row {
+    cursor: pointer;
+    touch-action: none;
+}
+
+/* for OS X ballistic scrolling */
+
+.monaco-list-row.scrolling {
+    display: none !important;
+}
+
+/* Focus */
+
+.monaco-list.element-focused,
+.monaco-list.selection-single,
+.monaco-list.selection-multiple {
+    outline: 0 !important;
+}
+
+/* Dnd */
+
+.monaco-drag-image {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 12px;
+    position: absolute;
+    z-index: 1000;
+}
+
+/* Type filter */
+
+.monaco-list-type-filter {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    border-radius: 2px;
+    padding: 0px 3px;
+    max-width: calc(100% - 10px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: right;
+    box-sizing: border-box;
+    cursor: all-scroll;
+    font-size: 13px;
+    line-height: 18px;
+    height: 20px;
+    z-index: 1;
+    top: 4px;
+}
+
+.monaco-list-type-filter.dragging {
+    transition: top 0.2s, left 0.2s;
+}
+
+.monaco-list-type-filter.ne {
+    right: 4px;
+}
+
+.monaco-list-type-filter.nw {
+    left: 4px;
+}
+
+.monaco-list-type-filter > .controls {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    transition: width 0.2s;
+    width: 0;
+}
+
+.monaco-list-type-filter.dragging > .controls,
+.monaco-list-type-filter:hover > .controls {
+    width: 36px;
+}
+
+.monaco-list-type-filter > .controls > * {
+    border: none;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: none;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.monaco-list-type-filter > .controls > .filter {
+    margin-left: 4px;
+}
+
+.monaco-list-type-filter-message {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: 40px 1em 1em 1em;
+    text-align: center;
+    white-space: normal;
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.monaco-list-type-filter-message:empty {
+    display: none;
+}
+
+/* Electron */
+
+.monaco-list-type-filter {
+    cursor: grab;
+}
+
+.monaco-list-type-filter.dragging {
+    cursor: grabbing;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-split-view2 {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.monaco-split-view2 > .sash-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.monaco-split-view2 > .sash-container > .monaco-sash {
+    pointer-events: initial;
+}
+
+.monaco-split-view2 > .monaco-scrollable-element {
+    width: 100%;
+    height: 100%;
+}
+
+.monaco-split-view2 > .monaco-scrollable-element > .split-view-container {
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    position: relative;
+}
+
+.monaco-split-view2 > .monaco-scrollable-element > .split-view-container > .split-view-view {
+    white-space: initial;
+    position: absolute;
+}
+
+.monaco-split-view2 > .monaco-scrollable-element > .split-view-container > .split-view-view:not(.visible) {
+    display: none;
+}
+
+.monaco-split-view2.vertical > .monaco-scrollable-element > .split-view-container > .split-view-view {
+    width: 100%;
+}
+
+.monaco-split-view2.horizontal > .monaco-scrollable-element > .split-view-container > .split-view-view {
+    height: 100%;
+}
+
+.monaco-split-view2.separator-border > .monaco-scrollable-element > .split-view-container > .split-view-view:not(:first-child)::before {
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    pointer-events: none;
+    background-color: var(--separator-border);
+}
+
+.monaco-split-view2.separator-border.horizontal > .monaco-scrollable-element > .split-view-container > .split-view-view:not(:first-child)::before {
+    height: 100%;
+    width: 1px;
+}
+
+.monaco-split-view2.separator-border.vertical > .monaco-scrollable-element > .split-view-container > .split-view-view:not(:first-child)::before {
+    height: 1px;
+    width: 100%;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-table {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.monaco-table > .monaco-split-view2 {
+    border-bottom: 1px solid transparent;
+}
+
+.monaco-table > .monaco-list {
+    flex: 1 1;
+}
+
+.monaco-table-tr {
+    display: flex;
+    height: 100%;
+}
+
+.monaco-table-th {
+    width: 100%;
+    height: 100%;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.monaco-table-th,
+.monaco-table-td {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.monaco-table > .monaco-split-view2 .monaco-sash.vertical::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--sash-size) / 2);
+    width: 0;
+    border-left: 1px solid transparent;
+}
+
+.monaco-table > .monaco-split-view2,
+.monaco-table > .monaco-split-view2 .monaco-sash.vertical::before {
+    transition: border-color 0.2s ease-out;
+}
+
+/*
+.monaco-table:hover > .monaco-split-view2,
+.monaco-table:hover > .monaco-split-view2 .monaco-sash.vertical::before {
+	border-color: rgba(204, 204, 204, 0.2);
+} */
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-tl-row {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    position: relative;
+}
+
+.monaco-tl-indent {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 16px;
+    pointer-events: none;
+}
+
+.hide-arrows .monaco-tl-indent {
+    left: 12px;
+}
+
+.monaco-tl-indent > .indent-guide {
+    display: inline-block;
+    box-sizing: border-box;
+    height: 100%;
+    border-left: 1px solid transparent;
+}
+
+.monaco-tl-indent > .indent-guide {
+    transition: border-color 0.1s linear;
+}
+
+.monaco-tl-twistie,
+.monaco-tl-contents {
+    height: 100%;
+}
+
+.monaco-tl-twistie {
+    font-size: 10px;
+    text-align: right;
+    padding-right: 6px;
+    flex-shrink: 0;
+    width: 16px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+}
+
+.monaco-tl-contents {
+    flex: 1 1;
+    overflow: hidden;
+}
+
+.monaco-tl-twistie::before {
+    border-radius: 20px;
+}
+
+.monaco-tl-twistie.collapsed::before {
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+
+.monaco-tl-twistie.codicon-tree-item-loading::before {
+    /* Use steps to throttle FPS to reduce CPU usage */
+    -webkit-animation: codicon-spin 1.25s steps(30) infinite;
+    animation: codicon-spin 1.25s steps(30) infinite;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.quick-input-widget {
+    font-size: 13px;
+}
+
+.quick-input-widget .monaco-highlighted-label .highlight,
+.quick-input-widget .monaco-highlighted-label .highlight {
+    color: #0066BF;
+}
+
+.vs .quick-input-widget .monaco-list-row.focused .monaco-highlighted-label .highlight,
+.vs .quick-input-widget .monaco-list-row.focused .monaco-highlighted-label .highlight {
+    color: #9DDDFF;
+}
+
+.vs-dark .quick-input-widget .monaco-highlighted-label .highlight,
+.vs-dark .quick-input-widget .monaco-highlighted-label .highlight {
+    color: #0097fb;
+}
+
+.hc-black .quick-input-widget .monaco-highlighted-label .highlight,
+.hc-black .quick-input-widget .monaco-highlighted-label .highlight {
+    color: #F38518;
+}
+
+.monaco-keybinding > .monaco-keybinding-key {
+    background-color: rgba(221, 221, 221, 0.4);
+    border: solid 1px rgba(204, 204, 204, 0.4);
+    border-bottom-color: rgba(187, 187, 187, 0.4);
+    box-shadow: inset 0 -1px 0 rgba(187, 187, 187, 0.4);
+    color: #555;
+}
+
+.hc-black .monaco-keybinding > .monaco-keybinding-key {
+    background-color: transparent;
+    border: solid 1px rgb(111, 195, 223);
+    box-shadow: none;
+    color: #fff;
+}
+
+.vs-dark .monaco-keybinding > .monaco-keybinding-key {
+    background-color: rgba(128, 128, 128, 0.17);
+    border: solid 1px rgba(51, 51, 51, 0.6);
+    border-bottom-color: rgba(68, 68, 68, 0.6);
+    box-shadow: inset 0 -1px 0 rgba(68, 68, 68, 0.6);
+    color: #ccc;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-text-button {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    padding: 4px;
+    text-align: center;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+}
+
+.monaco-text-button:focus {
+    outline-offset: 2px !important;
+}
+
+.monaco-text-button:hover {
+    text-decoration: none !important;
+}
+
+.monaco-button.disabled:focus,
+.monaco-button.disabled {
+    opacity: 0.4 !important;
+    cursor: default;
+}
+
+.monaco-text-button > .codicon {
+    margin: 0 0.2em;
+    color: inherit !important;
+}
+
+.monaco-button-dropdown {
+    display: flex;
+    cursor: pointer;
+}
+
+.monaco-button-dropdown > .monaco-dropdown-button {
+    margin-left: 1px;
+}
+
+.monaco-description-button {
+    flex-direction: column;
+}
+
+.monaco-description-button .monaco-button-label {
+    font-weight: 500;
+}
+
+.monaco-description-button .monaco-button-description {
+    font-style: italic;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-count-badge {
+    padding: 3px 6px;
+    border-radius: 11px;
+    font-size: 11px;
+    min-width: 18px;
+    min-height: 18px;
+    line-height: 11px;
+    font-weight: normal;
+    text-align: center;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.monaco-count-badge.long {
+    padding: 2px 3px;
+    border-radius: 2px;
+    min-height: auto;
+    line-height: normal;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-progress-container {
+    width: 100%;
+    height: 5px;
+    overflow: hidden; /* keep progress bit in bounds */
+}
+
+.monaco-progress-container .progress-bit {
+    width: 2%;
+    height: 5px;
+    position: absolute;
+    left: 0;
+    display: none;
+}
+
+.monaco-progress-container.active .progress-bit {
+    display: inherit;
+}
+
+.monaco-progress-container.discrete .progress-bit {
+    left: 0;
+    transition: width 100ms linear;
+}
+
+.monaco-progress-container.discrete.done .progress-bit {
+    width: 100%;
+}
+
+.monaco-progress-container.infinite .progress-bit {
+    -webkit-animation-name: progress;
+    animation-name: progress;
+    -webkit-animation-duration: 4s;
+    animation-duration: 4s;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+    -webkit-transform: translate3d(0px, 0px, 0px);
+    transform: translate3d(0px, 0px, 0px);
+}
+
+/**
+ * The progress bit has a width: 2% (1/50) of the parent container. The animation moves it from 0% to 100% of
+ * that container. Since translateX is relative to the progress bit size, we have to multiple it with
+ * its relative size to the parent container:
+ * parent width: 5000%
+ *    bit width: 100%
+ * translateX should be as follow:
+ *  50%: 5000% * 50% - 50% (set to center) = 2450%
+ * 100%: 5000% * 100% - 100% (do not overflow) = 4900%
+ */
+
+@-webkit-keyframes progress { from { -webkit-transform: translateX(0%) scaleX(1); transform: translateX(0%) scaleX(1)
+} 50% { -webkit-transform: translateX(2500%) scaleX(3); transform: translateX(2500%) scaleX(3)
+  } to { -webkit-transform: translateX(4900%) scaleX(1); transform: translateX(4900%) scaleX(1)
+    }
+}
+
+@keyframes progress { from { -webkit-transform: translateX(0%) scaleX(1); transform: translateX(0%) scaleX(1)
+} 50% { -webkit-transform: translateX(2500%) scaleX(3); transform: translateX(2500%) scaleX(3)
+  } to { -webkit-transform: translateX(4900%) scaleX(1); transform: translateX(4900%) scaleX(1)
+    }
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.quick-input-widget {
+    position: absolute;
+    width: 600px;
+    z-index: 2000;
+    padding: 0 1px 1px 1px;
+    left: 50%;
+    margin-left: -300px;
+}
+
+.quick-input-titlebar {
+    display: flex;
+    align-items: center;
+}
+
+.quick-input-left-action-bar {
+    display: flex;
+    margin-left: 4px;
+    flex: 1 1;
+}
+
+.quick-input-title {
+    padding: 3px 0px;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.quick-input-right-action-bar {
+    display: flex;
+    margin-right: 4px;
+    flex: 1 1;
+}
+
+.quick-input-right-action-bar > .actions-container {
+    justify-content: flex-end;
+}
+
+.quick-input-titlebar .monaco-action-bar .action-label.codicon {
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 2px;
+}
+
+.quick-input-description {
+    margin: 6px;
+}
+
+.quick-input-header .quick-input-description {
+    margin: 4px 2px;
+}
+
+.quick-input-header {
+    display: flex;
+    padding: 6px 6px 0px 6px;
+    margin-bottom: -2px;
+}
+
+.quick-input-widget.hidden-input .quick-input-header {
+    /* reduce margins and paddings when input box hidden */
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.quick-input-and-message {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+    position: relative;
+}
+
+.quick-input-check-all {
+    align-self: center;
+    margin: 0;
+}
+
+.quick-input-filter {
+    flex-grow: 1;
+    display: flex;
+    position: relative;
+}
+
+.quick-input-box {
+    flex-grow: 1;
+}
+
+.quick-input-widget.show-checkboxes .quick-input-box,
+.quick-input-widget.show-checkboxes .quick-input-message {
+    margin-left: 5px;
+}
+
+.quick-input-visible-count {
+    position: absolute;
+    left: -10000px;
+}
+
+.quick-input-count {
+    align-self: center;
+    position: absolute;
+    right: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.quick-input-count .monaco-count-badge {
+    vertical-align: middle;
+    padding: 2px 4px;
+    border-radius: 2px;
+    min-height: auto;
+    line-height: normal;
+}
+
+.quick-input-action {
+    margin-left: 6px;
+}
+
+.quick-input-action .monaco-text-button {
+    font-size: 11px;
+    padding: 0 6px;
+    display: flex;
+    height: 27.5px;
+    align-items: center;
+}
+
+.quick-input-message {
+    margin-top: -1px;
+    padding: 5px 5px 2px 5px;
+    overflow-wrap: break-word;
+}
+
+.quick-input-message > .codicon {
+    margin: 0 0.2em;
+    vertical-align: text-bottom;
+}
+
+.quick-input-progress.monaco-progress-container {
+    position: relative;
+}
+
+.quick-input-progress.monaco-progress-container,
+.quick-input-progress.monaco-progress-container .progress-bit {
+    height: 2px;
+}
+
+.quick-input-list {
+    line-height: 22px;
+    margin-top: 6px;
+}
+
+.quick-input-widget.hidden-input .quick-input-list {
+    margin-top: 0; /* reduce margins when input box hidden */
+}
+
+.quick-input-list .monaco-list {
+    overflow: hidden;
+    max-height: calc(20 * 22px);
+}
+
+.quick-input-list .quick-input-list-entry {
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    height: 100%;
+    padding: 0 6px;
+}
+
+.quick-input-list .quick-input-list-entry.quick-input-list-separator-border {
+    border-top-width: 1px;
+    border-top-style: solid;
+}
+
+.quick-input-list .monaco-list-row[data-index="0"] .quick-input-list-entry.quick-input-list-separator-border {
+    border-top-style: none;
+}
+
+.quick-input-list .quick-input-list-label {
+    overflow: hidden;
+    display: flex;
+    height: 100%;
+    flex: 1 1;
+}
+
+.quick-input-list .quick-input-list-checkbox {
+    align-self: center;
+    margin: 0;
+}
+
+.quick-input-list .quick-input-list-rows {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1 1;
+    margin-left: 5px;
+}
+
+.quick-input-widget.show-checkboxes .quick-input-list .quick-input-list-rows {
+    margin-left: 10px;
+}
+
+.quick-input-widget .quick-input-list .quick-input-list-checkbox {
+    display: none;
+}
+
+.quick-input-widget.show-checkboxes .quick-input-list .quick-input-list-checkbox {
+    display: inline;
+}
+
+.quick-input-list .quick-input-list-rows > .quick-input-list-row {
+    display: flex;
+    align-items: center;
+}
+
+.quick-input-list .quick-input-list-rows > .quick-input-list-row .monaco-icon-label,
+.quick-input-list .quick-input-list-rows > .quick-input-list-row .monaco-icon-label .monaco-icon-label-container > .monaco-icon-name-container {
+    flex: 1 1; /* make sure the icon label grows within the row */
+}
+
+.quick-input-list .quick-input-list-rows > .quick-input-list-row .codicon[class*='codicon-'] {
+    vertical-align: text-bottom;
+}
+
+.quick-input-list .quick-input-list-rows .monaco-highlighted-label span {
+    opacity: 1;
+}
+
+.quick-input-list .quick-input-list-entry .quick-input-list-entry-keybinding {
+    margin-right: 8px; /* separate from the separator label or scrollbar if any */
+}
+
+.quick-input-list .quick-input-list-label-meta {
+    opacity: 0.7;
+    line-height: normal;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.quick-input-list .monaco-highlighted-label .highlight {
+    font-weight: bold;
+}
+
+.quick-input-list .quick-input-list-entry .quick-input-list-separator {
+    margin-right: 8px; /* separate from keybindings or actions */
+}
+
+.quick-input-list .quick-input-list-entry-action-bar {
+    display: flex;
+    flex: 0 1;
+    overflow: visible;
+}
+
+.quick-input-list .quick-input-list-entry-action-bar .action-label {
+    /*
+       * By default, actions in the quick input action bar are hidden
+       * until hovered over them or selected.
+       */
+    display: none;
+}
+
+.quick-input-list .quick-input-list-entry-action-bar .action-label.codicon {
+    margin-right: 4px;
+    padding: 0px 2px 2px 2px;
+}
+
+.quick-input-list .quick-input-list-entry-action-bar {
+    margin-top: 1px;
+}
+
+.quick-input-list .quick-input-list-entry-action-bar {
+    margin-right: 4px; /* separate from scrollbar */
+}
+
+.quick-input-list .quick-input-list-entry .quick-input-list-entry-action-bar .action-label.always-visible,
+.quick-input-list .quick-input-list-entry:hover .quick-input-list-entry-action-bar .action-label,
+.quick-input-list .monaco-list-row.focused .quick-input-list-entry-action-bar .action-label {
+    display: flex;
+}
+
+/* focused items in quick pick */
+
+.quick-input-list .monaco-list-row.focused .monaco-keybinding-key,
+.quick-input-list .monaco-list-row.focused .quick-input-list-entry .quick-input-list-separator {
+    color: inherit
+}
+
+.quick-input-list .monaco-list-row.focused .monaco-keybinding-key {
+    background: none;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-inputbox {
+    position: relative;
+    display: block;
+    padding: 0;
+    box-sizing:	border-box;
+    /* Customizable */
+    font-size: inherit;
+}
+
+.monaco-inputbox.idle {
+    border: 1px solid transparent;
+}
+
+.monaco-inputbox > .ibwrapper > .input,
+.monaco-inputbox > .ibwrapper > .mirror {
+    /* Customizable */
+    padding: 4px;
+}
+
+.monaco-inputbox > .ibwrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.monaco-inputbox > .ibwrapper > .input {
+    display: inline-block;
+    box-sizing:	border-box;
+    width: 100%;
+    height: 100%;
+    line-height: inherit;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    resize: none;
+    color: inherit;
+}
+
+.monaco-inputbox > .ibwrapper > input {
+    text-overflow: ellipsis;
+}
+
+.monaco-inputbox > .ibwrapper > textarea.input {
+    display: block;
+    -ms-overflow-style: none; /* IE 10+: hide scrollbars */
+    scrollbar-width: none; /* Firefox: hide scrollbars */
+    outline: none;
+}
+
+.monaco-inputbox > .ibwrapper > textarea.input::-webkit-scrollbar {
+    display: none; /* Chrome + Safari: hide scrollbar */
+}
+
+.monaco-inputbox > .ibwrapper > textarea.input.empty {
+    white-space: nowrap;
+}
+
+.monaco-inputbox > .ibwrapper > .mirror {
+    position: absolute;
+    display: inline-block;
+    width: 100%;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    visibility: hidden;
+    word-wrap: break-word;
+}
+
+/* Context view */
+
+.monaco-inputbox-container {
+    text-align: right;
+}
+
+.monaco-inputbox-container .monaco-inputbox-message {
+    display: inline-block;
+    overflow: hidden;
+    text-align: left;
+    width: 100%;
+    box-sizing:	border-box;
+    padding: 0.4em;
+    font-size: 12px;
+    line-height: 17px;
+    margin-top: -1px;
+    word-wrap: break-word;
+}
+
+/* Action bar support */
+
+.monaco-inputbox .monaco-action-bar {
+    position: absolute;
+    right: 2px;
+    top: 4px;
+}
+
+.monaco-inputbox .monaco-action-bar .action-item {
+    margin-left: 2px;
+}
+
+.monaco-inputbox .monaco-action-bar .action-item .codicon {
+    background-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* ---------- Icon label ---------- */
+
+.monaco-icon-label {
+    display: flex; /* required for icons support :before rule */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.monaco-icon-label::before {
+    /* svg icons rendered as background image */
+    background-size: 16px;
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-right: 6px;
+    width: 16px;
+    height: 22px;
+    line-height: inherit !important;
+    display: inline-block;
+    /* fonts icons */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    vertical-align: top;
+    flex-shrink: 0; /* fix for https://github.com/microsoft/vscode/issues/13787 */
+}
+
+.monaco-icon-label > .monaco-icon-label-container {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1;
+}
+
+.monaco-icon-label > .monaco-icon-label-container > .monaco-icon-name-container > .label-name {
+    color: inherit;
+    white-space: pre; /* enable to show labels that include multiple whitespaces */
+}
+
+.monaco-icon-label > .monaco-icon-label-container > .monaco-icon-name-container > .label-name > .label-separator {
+    margin: 0 2px;
+    opacity: 0.5;
+}
+
+.monaco-icon-label > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+    opacity: .7;
+    margin-left: 0.5em;
+    font-size: 0.9em;
+    white-space: pre; /* enable to show labels that include multiple whitespaces */
+}
+
+.monaco-icon-label.nowrap > .monaco-icon-label-container > .monaco-icon-description-container > .label-description{
+    white-space: nowrap
+}
+
+.vs .monaco-icon-label > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+    opacity: .95;
+}
+
+.monaco-icon-label.italic > .monaco-icon-label-container > .monaco-icon-name-container > .label-name,
+.monaco-icon-label.italic > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+    font-style: italic;
+}
+
+.monaco-icon-label.deprecated {
+    text-decoration: line-through;
+    opacity: 0.66;
+}
+
+/* make sure apply italic font style to decorations as well */
+
+.monaco-icon-label.italic::after {
+    font-style: italic;
+}
+
+.monaco-icon-label.strikethrough > .monaco-icon-label-container > .monaco-icon-name-container > .label-name,
+.monaco-icon-label.strikethrough > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+    text-decoration: line-through;
+}
+
+.monaco-icon-label::after {
+    opacity: 0.75;
+    font-size: 90%;
+    font-weight: 600;
+    margin: 0 16px 0 5px;
+    text-align: center;
+}
+
+/* make sure selection color wins when a label is being selected */
+
+.monaco-list:focus .selected .monaco-icon-label, /* list */
+.monaco-list:focus .selected .monaco-icon-label::after
+{
+    color: inherit !important;
+}
+
+.monaco-list-row.focused.selected .label-description,
+.monaco-list-row.selected .label-description {
+    opacity: .8;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.monaco-keybinding {
+    display: flex;
+    align-items: center;
+    line-height: 10px;
+}
+
+.monaco-keybinding > .monaco-keybinding-key {
+    display: inline-block;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 3px;
+    vertical-align: middle;
+    font-size: 11px;
+    padding: 3px 5px;
+    margin: 0 2px;
+}
+
+.monaco-keybinding > .monaco-keybinding-key:first-child {
+    margin-left: 0;
+}
+
+.monaco-keybinding > .monaco-keybinding-key:last-child {
+    margin-right: 0;
+}
+
+.monaco-keybinding > .monaco-keybinding-key-separator {
+    display: inline-block;
+}
+
+.monaco-keybinding > .monaco-keybinding-key-chord-separator {
+    width: 6px;
+}
+
+/*purgecss end ignore*/
+
+/*purgecss start ignore*/
+
+.aui-root .hljs{
+    display:block;
+    overflow-x:auto;
+    padding:.5em;
+    background:#011627;
+    color:#d6deeb
+}
+
+.aui-root .hljs-keyword{
+    color:#c792ea;
+    font-style:italic
+}
+
+.aui-root .hljs-built_in{
+    color:#addb67;
+    font-style:italic
+}
+
+.aui-root .hljs-type{
+    color:#82aaff
+}
+
+.aui-root .hljs-literal{
+    color:#ff5874
+}
+
+.aui-root .hljs-number{
+    color:#f78c6c
+}
+
+.aui-root .hljs-regexp{
+    color:#5ca7e4
+}
+
+.aui-root .hljs-string{
+    color:#ecc48d
+}
+
+.aui-root .hljs-subst{
+    color:#d3423e
+}
+
+.aui-root .hljs-symbol{
+    color:#82aaff
+}
+
+.aui-root .hljs-class{
+    color:#ffcb8b
+}
+
+.aui-root .hljs-function{
+    color:#82aaff
+}
+
+.aui-root .hljs-title{
+    color:#dcdcaa;
+    font-style:italic
+}
+
+.aui-root .hljs-params{
+    color:#7fdbca
+}
+
+.aui-root .hljs-comment{
+    color:#637777;
+    font-style:italic
+}
+
+.aui-root .hljs-doctag{
+    color:#7fdbca
+}
+
+.aui-root .hljs-meta,.aui-root .hljs-meta-keyword{
+    color:#82aaff
+}
+
+.aui-root .hljs-meta-string{
+    color:#ecc48d
+}
+
+.aui-root .hljs-section{
+    color:#82b1ff
+}
+
+.aui-root .hljs-attr,.aui-root .hljs-builtin-name,.aui-root .hljs-name,.aui-root .hljs-tag{
+    color:#7fdbca
+}
+
+.aui-root .hljs-attribute{
+    color:#80cbc4
+}
+
+.aui-root .hljs-variable{
+    color:#addb67
+}
+
+.aui-root .hljs-bullet{
+    color:#d9f5dd
+}
+
+.aui-root .hljs-code{
+    color:#80cbc4
+}
+
+.aui-root .hljs-emphasis{
+    color:#c792ea;
+    font-style:italic
+}
+
+.aui-root .hljs-strong{
+    color:#addb67;
+    font-weight:700
+}
+
+.aui-root .hljs-formula{
+    color:#c792ea
+}
+
+.aui-root .hljs-link{
+    color:#ff869a
+}
+
+.aui-root .hljs-quote{
+    color:#697098;
+    font-style:italic
+}
+
+.aui-root .hljs-selector-tag{
+    color:#ff6363
+}
+
+.aui-root .hljs-selector-id{
+    color:#fad430
+}
+
+.aui-root .hljs-selector-class{
+    color:#addb67;
+    font-style:italic
+}
+
+.aui-root .hljs-selector-attr,.aui-root .hljs-selector-pseudo{
+    color:#c792ea;
+    font-style:italic
+}
+
+.aui-root .hljs-template-tag{
+    color:#c792ea
+}
+
+.aui-root .hljs-template-variable{
+    color:#addb67
+}
+
+.aui-root .hljs-addition{
+    color:#addb67;
+    font-style:italic
+}
+
+.aui-root .hljs-deletion{
+    color:rgba(239,83,80,.5647058823529412);
+    font-style:italic
+}
+
+/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*/
+
+/*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
+
+.aui-root html{
+    tab-size:4;
+    line-height:1.15;
+    -webkit-text-size-adjust:100%
+}
+
+.aui-root body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji
+}
+
+.aui-root hr{
+    height:0;
+    color:inherit
+}
+
+.aui-root abbr[title]{
+    -webkit-text-decoration:underline dotted;
+    text-decoration:underline dotted
+}
+
+.aui-root b,.aui-root strong{
+    font-weight:bolder
+}
+
+.aui-root code,.aui-root kbd,.aui-root pre,.aui-root samp{
+    font-family:ui-monospace,SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+    font-size:1em
+}
+
+.aui-root small{
+    font-size:80%
+}
+
+.aui-root sub,.aui-root sup{
+    font-size:75%;
+    line-height:0;
+    position:relative;
+    vertical-align:baseline
+}
+
+.aui-root sub{
+    bottom:-.25em
+}
+
+.aui-root sup{
+    top:-.5em
+}
+
+.aui-root table{
+    text-indent:0;
+    border-color:inherit
+}
+
+.aui-root button,.aui-root input,.aui-root optgroup,.aui-root select,.aui-root textarea{
+    font-family:inherit;
+    font-size:100%;
+    line-height:1.15;
+    margin:0
+}
+
+.aui-root button,.aui-root select{
+    text-transform:none
+}
+
+.aui-root [type=button],.aui-root button{
+    -webkit-appearance:button
+}
+
+.aui-root legend{
+    padding:0
+}
+
+.aui-root progress{
+    vertical-align:baseline
+}
+
+.aui-root summary{
+    display:list-item
+}
+
+.aui-root blockquote,.aui-root dd,.aui-root dl,.aui-root figure,.aui-root h1,.aui-root h2,.aui-root h3,.aui-root h4,.aui-root h5,.aui-root h6,.aui-root hr,.aui-root p,.aui-root pre{
+    margin:0
+}
+
+.aui-root button{
+    background-color:transparent;
+    background-image:none
+}
+
+.aui-root fieldset{
+    margin:0;
+    padding:0
+}
+
+.aui-root ol,.aui-root ul{
+    list-style:none;
+    margin:0;
+    padding:0
+}
+
+.aui-root html{
+    font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+    line-height:1.5
+}
+
+.aui-root body{
+    font-family:inherit;
+    line-height:inherit
+}
+
+.aui-root *,.aui-root :after,.aui-root :before{
+    box-sizing:border-box;
+    border:0 solid
+}
+
+.aui-root hr{
+    border-top-width:1px
+}
+
+.aui-root img{
+    border-style:solid
+}
+
+.aui-root textarea{
+    resize:vertical
+}
+
+.aui-root input::-webkit-input-placeholder, .aui-root textarea::-webkit-input-placeholder{
+    opacity:1;
+    color:#cbd5e0
+}
+
+.aui-root input::placeholder,.aui-root textarea::placeholder{
+    opacity:1;
+    color:#cbd5e0
+}
+
+.aui-root button{
+    cursor:pointer
+}
+
+.aui-root table{
+    border-collapse:collapse
+}
+
+.aui-root h1,.aui-root h2,.aui-root h3,.aui-root h4,.aui-root h5,.aui-root h6{
+    font-size:inherit;
+    font-weight:inherit
+}
+
+.aui-root a{
+    color:inherit;
+    text-decoration:inherit
+}
+
+.aui-root button,.aui-root input,.aui-root optgroup,.aui-root select,.aui-root textarea{
+    padding:0;
+    line-height:inherit;
+    color:inherit
+}
+
+.aui-root code,.aui-root kbd,.aui-root pre,.aui-root samp{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace
+}
+
+.aui-root audio,.aui-root canvas,.aui-root embed,.aui-root iframe,.aui-root img,.aui-root object,.aui-root svg,.aui-root video{
+    display:block;
+    vertical-align:middle
+}
+
+.aui-root img,.aui-root video{
+    max-width:100%;
+    height:auto
+}
+
+.aui-root [hidden]{
+    display:none
+}
+
+.aui-root *,.aui-root :after,.aui-root :before{
+    --tw-border-opacity:1;
+    border-color:rgba(203,213,224,var(--tw-border-opacity))
+}
+
+.aui-root .prose{
+    color:#4a5568;
+    max-width:65ch
+}
+
+.aui-root .prose [class~=lead]{
+    color:#718096;
+    font-size:1.25em;
+    line-height:1.6;
+    margin-top:1.2em;
+    margin-bottom:1.2em
+}
+
+.aui-root .prose a{
+    color:#1a202c;
+    text-decoration:underline;
+    font-weight:500
+}
+
+.aui-root .prose strong{
+    color:#1a202c;
+    font-weight:600
+}
+
+.aui-root .prose ol[type=a]{
+    --list-counter-style:lower-alpha
+}
+
+.aui-root .prose ol[type=i]{
+    --list-counter-style:lower-roman
+}
+
+.aui-root .prose ol[type="1"]{
+    --list-counter-style:decimal
+}
+
+.aui-root .prose ol>li{
+    position:relative;
+    padding-left:1.75em
+}
+
+.aui-root .prose ol>li:before{
+    content:counter(list-item,decimal) ".";
+    content:counter(list-item,var(--list-counter-style,decimal)) ".";
+    position:absolute;
+    font-weight:400;
+    color:#a0aec0;
+    left:0
+}
+
+.aui-root .prose ul>li{
+    position:relative;
+    padding-left:1.75em
+}
+
+.aui-root .prose ul>li:before{
+    content:"";
+    position:absolute;
+    background-color:#e2e8f0;
+    border-radius:50%;
+    width:.375em;
+    height:.375em;
+    top:.6875em;
+    left:.25em
+}
+
+.aui-root .prose hr{
+    border-color:#edf2f7;
+    border-top-width:1px;
+    margin-top:3em;
+    margin-bottom:3em
+}
+
+.aui-root .prose blockquote{
+    font-weight:500;
+    font-style:italic;
+    color:#1a202c;
+    border-left-width:.25rem;
+    border-left-color:#edf2f7;
+    quotes:"\201C""\201D""\2018""\2019";
+    margin-top:1.6em;
+    margin-bottom:1.6em;
+    padding-left:1em
+}
+
+.aui-root .prose blockquote p:first-of-type:before{
+    content:open-quote
+}
+
+.aui-root .prose blockquote p:last-of-type:after{
+    content:close-quote
+}
+
+.aui-root .prose h1{
+    color:#1a202c;
+    font-weight:800;
+    font-size:2.25em;
+    margin-top:0;
+    margin-bottom:.8888889em;
+    line-height:1.1111111
+}
+
+.aui-root .prose h2{
+    color:#1a202c;
+    font-weight:700;
+    font-size:1.5em;
+    margin-top:2em;
+    margin-bottom:1em;
+    line-height:1.3333333
+}
+
+.aui-root .prose h3{
+    color:#1a202c;
+    font-weight:600;
+    font-size:1.25em;
+    margin-top:1.6em;
+    margin-bottom:.6em;
+    line-height:1.6
+}
+
+.aui-root .prose h4{
+    color:#1a202c;
+    font-weight:600;
+    margin-top:1.5em;
+    margin-bottom:.5em;
+    line-height:1.5
+}
+
+.aui-root .prose figure figcaption{
+    color:#a0aec0;
+    font-size:.875em;
+    line-height:1.4285714;
+    margin-top:.8571429em
+}
+
+.aui-root .prose code{
+    color:#1a202c;
+    font-weight:600;
+    font-size:.875em
+}
+
+.aui-root .prose code:after,.aui-root .prose code:before{
+    content:"`"
+}
+
+.aui-root .prose a code{
+    color:#1a202c
+}
+
+.aui-root .prose pre{
+    color:#edf2f7;
+    background-color:#1a202c;
+    overflow-x:auto;
+    font-size:.875em;
+    line-height:1.7142857;
+    margin-top:1.7142857em;
+    margin-bottom:1.7142857em;
+    border-radius:.375rem;
+    padding:.8571429em 1.1428571em
+}
+
+.aui-root .prose pre code{
+    background-color:transparent;
+    border-width:0;
+    border-radius:0;
+    padding:0;
+    font-weight:400;
+    color:inherit;
+    font-size:inherit;
+    font-family:inherit;
+    line-height:inherit
+}
+
+.aui-root .prose pre code:after,.aui-root .prose pre code:before{
+    content:none
+}
+
+.aui-root .prose table{
+    width:100%;
+    table-layout:auto;
+    text-align:left;
+    margin-top:2em;
+    margin-bottom:2em;
+    font-size:.875em;
+    line-height:1.7142857
+}
+
+.aui-root .prose thead{
+    color:#1a202c;
+    font-weight:600;
+    border-bottom-width:1px;
+    border-bottom-color:#e2e8f0
+}
+
+.aui-root .prose thead th{
+    vertical-align:bottom;
+    padding-right:.5714286em;
+    padding-bottom:.5714286em;
+    padding-left:.5714286em
+}
+
+.aui-root .prose tbody tr{
+    border-bottom-width:1px;
+    border-bottom-color:#edf2f7
+}
+
+.aui-root .prose tbody tr:last-child{
+    border-bottom-width:0
+}
+
+.aui-root .prose tbody td{
+    vertical-align:top;
+    padding:.5714286em
+}
+
+.aui-root .prose{
+    font-size:1rem;
+    line-height:1.75
+}
+
+.aui-root .prose p{
+    margin-top:1.25em;
+    margin-bottom:1.25em
+}
+
+.aui-root .prose figure,.aui-root .prose img,.aui-root .prose video{
+    margin-top:2em;
+    margin-bottom:2em
+}
+
+.aui-root .prose figure>*{
+    margin-top:0;
+    margin-bottom:0
+}
+
+.aui-root .prose h2 code{
+    font-size:.875em
+}
+
+.aui-root .prose h3 code{
+    font-size:.9em
+}
+
+.aui-root .prose ol,.aui-root .prose ul{
+    margin-top:1.25em;
+    margin-bottom:1.25em
+}
+
+.aui-root .prose li{
+    margin-top:.5em;
+    margin-bottom:.5em
+}
+
+.aui-root .prose>ul>li p{
+    margin-top:.75em;
+    margin-bottom:.75em
+}
+
+.aui-root .prose>ul>li>:first-child{
+    margin-top:1.25em
+}
+
+.aui-root .prose>ul>li>:last-child{
+    margin-bottom:1.25em
+}
+
+.aui-root .prose>ol>li>:first-child{
+    margin-top:1.25em
+}
+
+.aui-root .prose>ol>li>:last-child{
+    margin-bottom:1.25em
+}
+
+.aui-root .prose ol ol,.aui-root .prose ol ul,.aui-root .prose ul ol,.aui-root .prose ul ul{
+    margin-top:.75em;
+    margin-bottom:.75em
+}
+
+.aui-root .prose h2+*,.aui-root .prose h3+*,.aui-root .prose h4+*,.aui-root .prose hr+*{
+    margin-top:0
+}
+
+.aui-root .prose thead th:first-child{
+    padding-left:0
+}
+
+.aui-root .prose thead th:last-child{
+    padding-right:0
+}
+
+.aui-root .prose tbody td:first-child{
+    padding-left:0
+}
+
+.aui-root .prose tbody td:last-child{
+    padding-right:0
+}
+
+.aui-root .prose>:first-child{
+    margin-top:0
+}
+
+.aui-root .prose>:last-child{
+    margin-bottom:0
+}
+
+@media (min-width:1024px){
+    .aui-root .container\:base .burger-menu{
+        display:none
+    }
+}
+
+@media (min-width:1024px){
+    .aui-root .container\:base .sidebar{
+        position:relative;
+        display:block;
+        height:auto;
+        width:16rem
+    }
+}
+
+@media (min-width:1024px){
+    .aui-root .container\:base .sidebar--content{
+        width:14rem
+    }
+}
+
+.aui-root .container\:xl .sidebar--content{
+    position:absolute;
+    left:50%;
+    -webkit-transform:translate(-50%);
+    transform:translate(-50%)
+}
+
+@media (min-width:1536px){
+    .aui-root .container\:base .panel-item{
+        display:flex
+    }
+}
+
+.aui-root .container\:xl .panel-item{
+    display:block
+}
+
+@media (min-width:1536px){
+    .aui-root .container\:base .panel--center .panel-item--center{
+        width:58.333333%
+    }
+}
+
+@media (min-width:1536px){
+    .aui-root .container\:base .panel--center .panel-item--right{
+        width:41.666667%
+    }
+}
+
+.aui-root .container\:xl .panel--center .panel-item--center,.aui-root .container\:xl .panel--center .panel-item--right{
+    width:100%
+}
+
+@media (min-width:1536px){
+    .aui-root .container\:base .examples{
+        margin-top:0;
+        padding:0
+    }
+}
+
+.aui-root .container\:base .panel--right{
+    display:none
+}
+
+@media (min-width:1536px){
+    .aui-root .container\:base .panel--right{
+        display:block;
+        width:41.666667%
+    }
+}
+
+.aui-root .container\:xl .panel--right{
+    display:none
+}
+
+.aui-root .prose pre{
+    white-space:pre-wrap
+}
+
+.aui-root .fixed{
+    position:fixed
+}
+
+.aui-root .absolute{
+    position:absolute
+}
+
+.aui-root .relative{
+    position:relative
+}
+
+.aui-root .top-0{
+    top:0
+}
+
+.aui-root .right-0{
+    right:0
+}
+
+.aui-root .right-8{
+    right:2rem
+}
+
+.aui-root .bottom-16{
+    bottom:4rem
+}
+
+.aui-root .z-10{
+    z-index:10
+}
+
+.aui-root .z-20{
+    z-index:20
+}
+
+.aui-root .z-30{
+    z-index:30
+}
+
+.aui-root .mx-2{
+    margin-left:.5rem;
+    margin-right:.5rem
+}
+
+.aui-root .-mx-8{
+    margin-left:-2rem;
+    margin-right:-2rem
+}
+
+.aui-root .my-2{
+    margin-top:.5rem;
+    margin-bottom:.5rem
+}
+
+.aui-root .mt-1{
+    margin-top:.25rem
+}
+
+.aui-root .mt-2{
+    margin-top:.5rem
+}
+
+.aui-root .mt-4{
+    margin-top:1rem
+}
+
+.aui-root .mt-9{
+    margin-top:2.25rem
+}
+
+.aui-root .mt-10{
+    margin-top:2.5rem
+}
+
+.aui-root .mt-16{
+    margin-top:4rem
+}
+
+.aui-root .mr-1{
+    margin-right:.25rem
+}
+
+.aui-root .mr-2{
+    margin-right:.5rem
+}
+
+.aui-root .mb-2{
+    margin-bottom:.5rem
+}
+
+.aui-root .mb-3{
+    margin-bottom:.75rem
+}
+
+.aui-root .mb-4{
+    margin-bottom:1rem
+}
+
+.aui-root .mb-12{
+    margin-bottom:3rem
+}
+
+.aui-root .-mb-1{
+    margin-bottom:-.25rem
+}
+
+.aui-root .ml-0{
+    margin-left:0
+}
+
+.aui-root .ml-1{
+    margin-left:.25rem
+}
+
+.aui-root .ml-2{
+    margin-left:.5rem
+}
+
+.aui-root .ml-0\.5{
+    margin-left:.125rem
+}
+
+.aui-root .block{
+    display:block
+}
+
+.aui-root .inline-block{
+    display:inline-block
+}
+
+.aui-root .flex{
+    display:flex
+}
+
+.aui-root .table{
+    display:table
+}
+
+.aui-root .hidden{
+    display:none
+}
+
+.aui-root .h-5{
+    height:1.25rem
+}
+
+.aui-root .h-6{
+    height:1.5rem
+}
+
+.aui-root .h-16{
+    height:4rem
+}
+
+.aui-root .h-full{
+    height:100%
+}
+
+.aui-root .max-h-screen{
+    max-height:100vh
+}
+
+.aui-root .w-5{
+    width:1.25rem
+}
+
+.aui-root .w-16{
+    width:4rem
+}
+
+.aui-root .w-20{
+    width:5rem
+}
+
+.aui-root .w-64{
+    width:16rem
+}
+
+.aui-root .w-full{
+    width:100%
+}
+
+.aui-root .min-w-1\/4{
+    min-width:25%
+}
+
+.aui-root .max-w-none{
+    max-width:none
+}
+
+.aui-root .flex-1{
+    flex:1 1
+}
+
+.aui-root .transform{
+    --tw-translate-x:0;
+    --tw-translate-y:0;
+    --tw-rotate:0;
+    --tw-skew-x:0;
+    --tw-skew-y:0;
+    --tw-scale-x:1;
+    --tw-scale-y:1;
+    -webkit-transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+}
+
+.aui-root .-rotate-180{
+    --tw-rotate:-180deg
+}
+
+.aui-root .-rotate-90{
+    --tw-rotate:-90deg
+}
+
+@-webkit-keyframes spin{
+    to{
+        -webkit-transform:rotate(1turn);
+        transform:rotate(1turn)
+    }
+}
+
+@keyframes spin{
+    to{
+        -webkit-transform:rotate(1turn);
+        transform:rotate(1turn)
+    }
+}
+
+@-webkit-keyframes ping{
+    75%,to{
+        -webkit-transform:scale(2);
+        transform:scale(2);
+        opacity:0
+    }
+}
+
+@keyframes ping{
+    75%,to{
+        -webkit-transform:scale(2);
+        transform:scale(2);
+        opacity:0
+    }
+}
+
+@-webkit-keyframes pulse{
+    50%{
+        opacity:.5
+    }
+}
+
+@keyframes pulse{
+    50%{
+        opacity:.5
+    }
+}
+
+@-webkit-keyframes bounce{
+    0%,to{
+        -webkit-transform:translateY(-25%);
+        transform:translateY(-25%);
+        -webkit-animation-timing-function:cubic-bezier(.8,0,1,1);
+        animation-timing-function:cubic-bezier(.8,0,1,1)
+    }
+
+    50%{
+        -webkit-transform:none;
+        transform:none;
+        -webkit-animation-timing-function:cubic-bezier(0,0,.2,1);
+        animation-timing-function:cubic-bezier(0,0,.2,1)
+    }
+}
+
+@keyframes bounce{
+    0%,to{
+        -webkit-transform:translateY(-25%);
+        transform:translateY(-25%);
+        -webkit-animation-timing-function:cubic-bezier(.8,0,1,1);
+        animation-timing-function:cubic-bezier(.8,0,1,1)
+    }
+
+    50%{
+        -webkit-transform:none;
+        transform:none;
+        -webkit-animation-timing-function:cubic-bezier(0,0,.2,1);
+        animation-timing-function:cubic-bezier(0,0,.2,1)
+    }
+}
+
+.aui-root .cursor-pointer{
+    cursor:pointer
+}
+
+.aui-root .flex-wrap{
+    flex-wrap:wrap
+}
+
+.aui-root .items-center{
+    align-items:center
+}
+
+.aui-root .justify-center{
+    justify-content:center
+}
+
+.aui-root .space-x-2>:not([hidden])~:not([hidden]){
+    --tw-space-x-reverse:0;
+    margin-right:calc(0.5rem*var(--tw-space-x-reverse));
+    margin-left:calc(0.5rem*(1 - var(--tw-space-x-reverse)))
+}
+
+.aui-root .space-y-2>:not([hidden])~:not([hidden]){
+    --tw-space-y-reverse:0;
+    margin-top:calc(0.5rem*(1 - var(--tw-space-y-reverse)));
+    margin-bottom:calc(0.5rem*var(--tw-space-y-reverse))
+}
+
+.aui-root .overflow-auto{
+    overflow:auto
+}
+
+.aui-root .overflow-y-auto{
+    overflow-y:auto
+}
+
+.aui-root .whitespace-pre-wrap{
+    white-space:pre-wrap
+}
+
+.aui-root .break-words{
+    overflow-wrap:break-word
+}
+
+.aui-root .break-all{
+    word-break:break-all
+}
+
+.aui-root .rounded{
+    border-radius:.25rem
+}
+
+.aui-root .rounded-full{
+    border-radius:9999px
+}
+
+.aui-root .border{
+    border-width:1px
+}
+
+.aui-root .border-l-8{
+    border-left-width:8px
+}
+
+.aui-root .border-solid{
+    border-style:solid
+}
+
+.aui-root .border-gray-400{
+    --tw-border-opacity:1;
+    border-color:rgba(203,213,224,var(--tw-border-opacity))
+}
+
+.aui-root .border-red-500{
+    --tw-border-opacity:1;
+    border-color:rgba(245,101,101,var(--tw-border-opacity))
+}
+
+.aui-root .border-orange-300{
+    --tw-border-opacity:1;
+    border-color:rgba(251,211,141,var(--tw-border-opacity))
+}
+
+.aui-root .border-green-600{
+    --tw-border-opacity:1;
+    border-color:rgba(56,161,105,var(--tw-border-opacity))
+}
+
+.aui-root .border-blue-300{
+    --tw-border-opacity:1;
+    border-color:rgba(144,205,244,var(--tw-border-opacity))
+}
+
+.aui-root .border-blue-600{
+    --tw-border-opacity:1;
+    border-color:rgba(49,130,206,var(--tw-border-opacity))
+}
+
+.aui-root .border-purple-300{
+    --tw-border-opacity:1;
+    border-color:rgba(214,188,250,var(--tw-border-opacity))
+}
+
+.aui-root .bg-white{
+    --tw-bg-opacity:1;
+    background-color:rgba(255,255,255,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-gray-100{
+    --tw-bg-opacity:1;
+    background-color:rgba(247,250,252,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-gray-200{
+    --tw-bg-opacity:1;
+    background-color:rgba(237,242,247,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-gray-800{
+    --tw-bg-opacity:1;
+    background-color:rgba(45,55,72,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-yellow-600{
+    --tw-bg-opacity:1;
+    background-color:rgba(214,158,46,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-green-600{
+    --tw-bg-opacity:1;
+    background-color:rgba(56,161,105,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-teal-500{
+    --tw-bg-opacity:1;
+    background-color:rgba(56,178,172,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-blue-400{
+    --tw-bg-opacity:1;
+    background-color:rgba(99,179,237,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-blue-500{
+    --tw-bg-opacity:1;
+    background-color:rgba(66,153,225,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-blue-600{
+    --tw-bg-opacity:1;
+    background-color:rgba(49,130,206,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-indigo-400{
+    --tw-bg-opacity:1;
+    background-color:rgba(127,156,245,var(--tw-bg-opacity))
+}
+
+.aui-root .bg-purple-600{
+    --tw-bg-opacity:1;
+    background-color:rgba(128,90,213,var(--tw-bg-opacity))
+}
+
+.aui-root .hover\:bg-orange-300:hover{
+    --tw-bg-opacity:1;
+    background-color:rgba(251,211,141,var(--tw-bg-opacity))
+}
+
+.aui-root .hover\:bg-blue-300:hover{
+    --tw-bg-opacity:1;
+    background-color:rgba(144,205,244,var(--tw-bg-opacity))
+}
+
+.aui-root .hover\:bg-purple-300:hover{
+    --tw-bg-opacity:1;
+    background-color:rgba(214,188,250,var(--tw-bg-opacity))
+}
+
+.aui-root .fill-current{
+    fill:currentColor
+}
+
+.aui-root .p-1{
+    padding:.25rem
+}
+
+.aui-root .p-2{
+    padding:.5rem
+}
+
+.aui-root .p-4{
+    padding:1rem
+}
+
+.aui-root .p-8{
+    padding:2rem
+}
+
+.aui-root .px-1{
+    padding-left:.25rem;
+    padding-right:.25rem
+}
+
+.aui-root .px-2{
+    padding-left:.5rem;
+    padding-right:.5rem
+}
+
+.aui-root .px-3{
+    padding-left:.75rem;
+    padding-right:.75rem
+}
+
+.aui-root .px-4{
+    padding-left:1rem;
+    padding-right:1rem
+}
+
+.aui-root .px-8{
+    padding-left:2rem;
+    padding-right:2rem
+}
+
+.aui-root .py-0{
+    padding-top:0;
+    padding-bottom:0
+}
+
+.aui-root .py-1{
+    padding-top:.25rem;
+    padding-bottom:.25rem
+}
+
+.aui-root .py-2{
+    padding-top:.5rem;
+    padding-bottom:.5rem
+}
+
+.aui-root .py-4{
+    padding-top:1rem;
+    padding-bottom:1rem
+}
+
+.aui-root .py-8{
+    padding-top:2rem;
+    padding-bottom:2rem
+}
+
+.aui-root .py-0\.5{
+    padding-top:.125rem;
+    padding-bottom:.125rem
+}
+
+.aui-root .pt-8{
+    padding-top:2rem
+}
+
+.aui-root .pb-16{
+    padding-bottom:4rem
+}
+
+.aui-root .text-left{
+    text-align:left
+}
+
+.aui-root .text-center{
+    text-align:center
+}
+
+.aui-root .align-baseline{
+    vertical-align:baseline
+}
+
+.aui-root .font-sans{
+    font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji
+}
+
+.aui-root .font-mono{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace
+}
+
+.aui-root .text-xs{
+    font-size:.75rem
+}
+
+.aui-root .text-sm{
+    font-size:.875rem
+}
+
+.aui-root .text-base{
+    font-size:1rem
+}
+
+.aui-root .text-lg{
+    font-size:1.125rem
+}
+
+.aui-root .text-2xl{
+    font-size:1.5rem
+}
+
+.aui-root .text-3xl{
+    font-size:1.875rem
+}
+
+.aui-root .text-4xl{
+    font-size:2.25rem
+}
+
+.aui-root .font-thin{
+    font-weight:100
+}
+
+.aui-root .font-extralight{
+    font-weight:200
+}
+
+.aui-root .font-light{
+    font-weight:300
+}
+
+.aui-root .font-bold{
+    font-weight:700
+}
+
+.aui-root .uppercase{
+    text-transform:uppercase
+}
+
+.aui-root .lowercase{
+    text-transform:lowercase
+}
+
+.aui-root .capitalize{
+    text-transform:capitalize
+}
+
+.aui-root .italic{
+    font-style:italic
+}
+
+.aui-root .leading-normal{
+    line-height:1.5
+}
+
+.aui-root .text-white{
+    --tw-text-opacity:1;
+    color:rgba(255,255,255,var(--tw-text-opacity))
+}
+
+.aui-root .text-gray-200{
+    --tw-text-opacity:1;
+    color:rgba(237,242,247,var(--tw-text-opacity))
+}
+
+.aui-root .text-gray-500{
+    --tw-text-opacity:1;
+    color:rgba(160,174,192,var(--tw-text-opacity))
+}
+
+.aui-root .text-gray-600{
+    --tw-text-opacity:1;
+    color:rgba(113,128,150,var(--tw-text-opacity))
+}
+
+.aui-root .text-gray-700{
+    --tw-text-opacity:1;
+    color:rgba(74,85,104,var(--tw-text-opacity))
+}
+
+.aui-root .text-gray-800{
+    --tw-text-opacity:1;
+    color:rgba(45,55,72,var(--tw-text-opacity))
+}
+
+.aui-root .text-red-600{
+    --tw-text-opacity:1;
+    color:rgba(229,62,62,var(--tw-text-opacity))
+}
+
+.aui-root .text-orange-500{
+    --tw-text-opacity:1;
+    color:rgba(237,137,54,var(--tw-text-opacity))
+}
+
+.aui-root .text-orange-600{
+    --tw-text-opacity:1;
+    color:rgba(221,107,32,var(--tw-text-opacity))
+}
+
+.aui-root .text-green-600{
+    --tw-text-opacity:1;
+    color:rgba(56,161,105,var(--tw-text-opacity))
+}
+
+.aui-root .text-teal-500{
+    --tw-text-opacity:1;
+    color:rgba(56,178,172,var(--tw-text-opacity))
+}
+
+.aui-root .text-blue-500{
+    --tw-text-opacity:1;
+    color:rgba(66,153,225,var(--tw-text-opacity))
+}
+
+.aui-root .text-purple-500{
+    --tw-text-opacity:1;
+    color:rgba(159,122,234,var(--tw-text-opacity))
+}
+
+.aui-root .hover\:text-gray-900:hover{
+    --tw-text-opacity:1;
+    color:rgba(26,32,44,var(--tw-text-opacity))
+}
+
+.aui-root .hover\:text-orange-600:hover{
+    --tw-text-opacity:1;
+    color:rgba(221,107,32,var(--tw-text-opacity))
+}
+
+.aui-root .hover\:text-blue-600:hover{
+    --tw-text-opacity:1;
+    color:rgba(49,130,206,var(--tw-text-opacity))
+}
+
+.aui-root .hover\:text-purple-600:hover{
+    --tw-text-opacity:1;
+    color:rgba(128,90,213,var(--tw-text-opacity))
+}
+
+.aui-root .underline{
+    text-decoration:underline
+}
+
+.aui-root .no-underline{
+    text-decoration:none
+}
+
+.aui-root *,.aui-root :after,.aui-root :before{
+    --tw-shadow:0 0 transparent
+}
+
+.aui-root .shadow{
+    --tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06)
+}
+
+.aui-root .shadow,.aui-root .shadow-md{
+    box-shadow:0 0 transparent,0 0 transparent,var(--tw-shadow);
+    box-shadow:var(--tw-ring-offset-shadow,0 0 transparent),var(--tw-ring-shadow,0 0 transparent),var(--tw-shadow)
+}
+
+.aui-root .shadow-md{
+    --tw-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06)
+}
+
+.aui-root .focus\:outline-none:focus{
+    outline:2px solid transparent;
+    outline-offset:2px
+}
+
+.aui-root *,.aui-root :after,.aui-root :before{
+    --tw-ring-inset:var(--tw-empty,/*!*/ /*!*/);
+    --tw-ring-offset-width:0px;
+    --tw-ring-offset-color:#fff;
+    --tw-ring-color:rgba(66,153,225,0.5);
+    --tw-ring-offset-shadow:0 0 transparent;
+    --tw-ring-shadow:0 0 transparent
+}
+
+.aui-root .filter{
+    --tw-blur:var(--tw-empty,/*!*/ /*!*/);
+    --tw-brightness:var(--tw-empty,/*!*/ /*!*/);
+    --tw-contrast:var(--tw-empty,/*!*/ /*!*/);
+    --tw-grayscale:var(--tw-empty,/*!*/ /*!*/);
+    --tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);
+    --tw-invert:var(--tw-empty,/*!*/ /*!*/);
+    --tw-saturate:var(--tw-empty,/*!*/ /*!*/);
+    --tw-sepia:var(--tw-empty,/*!*/ /*!*/);
+    --tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);
+    -webkit-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+    filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
+}
+
+.aui-root .transition-transform{
+    transition-property:-webkit-transform;
+    transition-property:transform;
+    transition-property:transform, -webkit-transform;
+    transition-timing-function:cubic-bezier(.4,0,.2,1);
+    transition-duration:.15s
+}
+
+.aui-root .duration-150{
+    transition-duration:.15s
+}
+
+.aui-root .ease-linear{
+    transition-timing-function:linear
+}
+
+@media (min-width:768px){
+    .aui-root .md\:flex{
+        display:flex
+    }
+}
+
+@media (min-width:1536px){
+    .aui-root .\32xl\:mx-0{
+        margin-left:0;
+        margin-right:0
+    }
+
+    .aui-root .\32xl\:w-7\/12{
+        width:58.333333%
+    }
+
+    .aui-root .\32xl\:rounded{
+        border-radius:.25rem
+    }
+
+    .aui-root .\32xl\:px-4{
+        padding-left:1rem;
+        padding-right:1rem
+    }
+}
+
+/*purgecss end ignore*/
+/*! tailwindcss v2.2.17 | MIT License | https://tailwindcss.com */
+
+/*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
+
+/*
+Document
+========
+*/
+
+/**
+Use a better box model (opinionated).
+*/
+
+*,
+::before,
+::after {
+    box-sizing: border-box;
+}
+
+/**
+Use a more readable tab size (opinionated).
+*/
+
+html {
+    tab-size: 4;
+}
+
+/**
+1. Correct the line height in all browsers.
+2. Prevent adjustments of font size after orientation changes in iOS.
+*/
+
+html {
+    line-height: 1.15; /* 1 */
+    -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/*
+Sections
+========
+*/
+
+/**
+Remove the margin in all browsers.
+*/
+
+body {
+    margin: 0;
+}
+
+/**
+Improve consistency of default fonts in all browsers. (https://github.com/sindresorhus/modern-normalize/issues/3)
+*/
+
+body {
+    font-family:
+            system-ui,
+            -apple-system, /* Firefox supports this but not yet `system-ui` */
+            'Segoe UI',
+            Roboto,
+            Helvetica,
+            Arial,
+            sans-serif,
+            'Apple Color Emoji',
+            'Segoe UI Emoji';
+}
+
+/*
+Grouping content
+================
+*/
+
+/**
+1. Add the correct height in Firefox.
+2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
+*/
+
+hr {
+    height: 0; /* 1 */
+    color: inherit; /* 2 */
+}
+
+/*
+Text-level semantics
+====================
+*/
+
+/**
+Add the correct text decoration in Chrome, Edge, and Safari.
+*/
+
+abbr[title] {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+}
+
+/**
+Add the correct font weight in Edge and Safari.
+*/
+
+b,
+strong {
+    font-weight: bolder;
+}
+
+/**
+1. Improve consistency of default fonts in all browsers. (https://github.com/sindresorhus/modern-normalize/issues/3)
+2. Correct the odd 'em' font sizing in all browsers.
+*/
+
+code,
+kbd,
+samp,
+pre {
+    font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Consolas,
+            'Liberation Mono',
+            Menlo,
+            monospace; /* 1 */
+    font-size: 1em; /* 2 */
+}
+
+/**
+Add the correct font size in all browsers.
+*/
+
+small {
+    font-size: 80%;
+}
+
+/**
+Prevent 'sub' and 'sup' elements from affecting the line height in all browsers.
+*/
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+sup {
+    top: -0.5em;
+}
+
+/*
+Tabular data
+============
+*/
+
+/**
+1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
+2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
+*/
+
+table {
+    text-indent: 0; /* 1 */
+    border-color: inherit; /* 2 */
+}
+
+/*
+Forms
+=====
+*/
+
+/**
+1. Change the font styles in all browsers.
+2. Remove the margin in Firefox and Safari.
+*/
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: inherit; /* 1 */
+    font-size: 100%; /* 1 */
+    line-height: 1.15; /* 1 */
+    margin: 0; /* 2 */
+}
+
+/**
+Remove the inheritance of text transform in Edge and Firefox.
+1. Remove the inheritance of text transform in Firefox.
+*/
+
+button,
+select { /* 1 */
+    text-transform: none;
+}
+
+/**
+Correct the inability to style clickable types in iOS and Safari.
+*/
+
+button,
+[type='button'] {
+    -webkit-appearance: button;
+}
+
+/**
+Remove the inner border and padding in Firefox.
+*/
+
+::-moz-focus-inner {
+    border-style: none;
+    padding: 0;
+}
+
+/**
+Restore the focus styles unset by the previous rule.
+*/
+
+/**
+Remove the additional ':invalid' styles in Firefox.
+See: https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737
+*/
+
+/**
+Remove the padding so developers are not caught out when they zero out 'fieldset' elements in all browsers.
+*/
+
+legend {
+    padding: 0;
+}
+
+/**
+Add the correct vertical alignment in Chrome and Firefox.
+*/
+
+progress {
+    vertical-align: baseline;
+}
+
+/**
+Correct the cursor style of increment and decrement buttons in Safari.
+*/
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+    height: auto;
+}
+
+/**
+1. Correct the odd appearance in Chrome and Safari.
+2. Correct the outline style in Safari.
+*/
+
+[type='search'] {
+    -webkit-appearance: textfield; /* 1 */
+    outline-offset: -2px; /* 2 */
+}
+
+/**
+Remove the inner padding in Chrome and Safari on macOS.
+*/
+
+::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/**
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Change font properties to 'inherit' in Safari.
+*/
+
+::-webkit-file-upload-button {
+    -webkit-appearance: button; /* 1 */
+    font: inherit; /* 2 */
+}
+
+/*
+Interactive
+===========
+*/
+
+/*
+Add the correct display in Chrome and Safari.
+*/
+
+summary {
+    display: list-item;
+}
+
+/**
+ * Manually forked from SUIT CSS Base: https://github.com/suitcss/base
+ * A thin layer on top of normalize.css that provides a starting point more
+ * suitable for web applications.
+ */
+
+/**
+ * Removes the default spacing and border for appropriate elements.
+ */
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+    margin: 0;
+}
+
+button {
+    background-color: transparent;
+    background-image: none;
+}
+
+fieldset {
+    margin: 0;
+    padding: 0;
+}
+
+ol,
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/**
+ * Tailwind custom reset styles
+ */
+
+/**
+ * 1. Use the user's configured `sans` font-family (with Tailwind's default
+ *    sans-serif font stack as a fallback) as a sane default.
+ * 2. Use Tailwind's default "normal" line-height so the user isn't forced
+ *    to override it to ensure consistency even when using the default theme.
+ */
+
+html {
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* 1 */
+    line-height: 1.5; /* 2 */
+}
+
+/**
+ * Inherit font-family and line-height from `html` so users can set them as
+ * a class directly on the `html` element.
+ */
+
+body {
+    font-family: inherit;
+    line-height: inherit;
+}
+
+/**
+ * 1. Prevent padding and border from affecting element width.
+ *
+ *    We used to set this in the html element and inherit from
+ *    the parent element for everything else. This caused issues
+ *    in shadow-dom-enhanced elements like <details> where the content
+ *    is wrapped by a div with box-sizing set to `content-box`.
+ *
+ *    https://github.com/mozdevs/cssremedy/issues/4
+ *
+ *
+ * 2. Allow adding a border to an element by just adding a border-width.
+ *
+ *    By default, the way the browser specifies that an element should have no
+ *    border is by setting it's border-style to `none` in the user-agent
+ *    stylesheet.
+ *
+ *    In order to easily add borders to elements by just setting the `border-width`
+ *    property, we change the default border-style for all elements to `solid`, and
+ *    use border-width to hide them instead. This way our `border` utilities only
+ *    need to set the `border-width` property instead of the entire `border`
+ *    shorthand, making our border utilities much more straightforward to compose.
+ *
+ *    https://github.com/tailwindcss/tailwindcss/pull/116
+ */
+
+*,
+::before,
+::after {
+    box-sizing: border-box; /* 1 */
+    border-width: 0; /* 2 */
+    border-style: solid; /* 2 */
+    border-color: currentColor; /* 2 */
+}
+
+/*
+ * Ensure horizontal rules are visible by default
+ */
+
+hr {
+    border-top-width: 1px;
+}
+
+/**
+ * Undo the `border-style: none` reset that Normalize applies to images so that
+ * our `border-{width}` utilities have the expected effect.
+ *
+ * The Normalize reset is unnecessary for us since we default the border-width
+ * to 0 on all elements.
+ *
+ * https://github.com/tailwindcss/tailwindcss/issues/362
+ */
+
+img {
+    border-style: solid;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+    opacity: 1;
+    color: #9ca3af;
+}
+
+input::placeholder,
+textarea::placeholder {
+    opacity: 1;
+    color: #9ca3af;
+}
+
+button,
+[role="button"] {
+    cursor: pointer;
+}
+
+/**
+ * Override legacy focus reset from Normalize with modern Firefox focus styles.
+ *
+ * This is actually an improvement over the new defaults in Firefox in our testing,
+ * as it triggers the better focus styles even for links, which still use a dotted
+ * outline in Firefox by default.
+ */
+
+table {
+    border-collapse: collapse;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+/**
+ * Reset links to optimize for opt-in styling instead of
+ * opt-out.
+ */
+
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+/**
+ * Reset form element properties that are easy to forget to
+ * style explicitly so you don't inadvertently introduce
+ * styles that deviate from your design system. These styles
+ * supplement a partial reset that is already applied by
+ * normalize.css.
+ */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    padding: 0;
+    line-height: inherit;
+    color: inherit;
+}
+
+/**
+ * Use the configured 'mono' font family for elements that
+ * are expected to be rendered with a monospace font, falling
+ * back to the system monospace stack if there is no configured
+ * 'mono' font family.
+ */
+
+pre,
+code,
+kbd,
+samp {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/**
+ * 1. Make replaced elements `display: block` by default as that's
+ *    the behavior you want almost all of the time. Inspired by
+ *    CSS Remedy, with `svg` added as well.
+ *
+ *    https://github.com/mozdevs/cssremedy/issues/14
+ *
+ * 2. Add `vertical-align: middle` to align replaced elements more
+ *    sensibly by default when overriding `display` by adding a
+ *    utility like `inline`.
+ *
+ *    This can trigger a poorly considered linting error in some
+ *    tools but is included by design.
+ *
+ *    https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210
+ */
+
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+    display: block; /* 1 */
+    vertical-align: middle; /* 2 */
+}
+
+/**
+ * Constrain images and videos to the parent width and preserve
+ * their intrinsic aspect ratio.
+ *
+ * https://github.com/mozdevs/cssremedy/issues/14
+ */
+
+img,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+/**
+ * Ensure the default browser behavior of the `hidden` attribute.
+ */
+
+[hidden] {
+    display: none;
+}
+
+*, ::before, ::after {
+    --tw-border-opacity: 1;
+    border-color: rgba(229, 231, 235, var(--tw-border-opacity));
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.visible {
+    visibility: visible;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.static {
+    position: static;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.relative {
+    position: relative;
+}
+
+.inset-0 {
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+.top-0 {
+    top: 0px;
+}
+
+.top-5 {
+    top: 1.25rem;
+}
+
+.top-12 {
+    top: 3rem;
+}
+
+.right-0 {
+    right: 0px;
+}
+
+.right-5 {
+    right: 1.25rem;
+}
+
+.bottom-0 {
+    bottom: 0px;
+}
+
+.bottom-10 {
+    bottom: 2.5rem;
+}
+
+.left-0 {
+    left: 0px;
+}
+
+.left-10 {
+    left: 2.5rem;
+}
+
+.z-10 {
+    z-index: 10;
+}
+
+.z-20 {
+    z-index: 20;
+}
+
+.z-50 {
+    z-index: 50;
+}
+
+.m-4 {
+    margin: 1rem;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.my-8 {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mt-3 {
+    margin-top: 0.75rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mt-5 {
+    margin-top: 1.25rem;
+}
+
+.mt-8 {
+    margin-top: 2rem;
+}
+
+.mt-10 {
+    margin-top: 2.5rem;
+}
+
+.-mt-0 {
+    margin-top: 0px;
+}
+
+.-mt-2 {
+    margin-top: -0.5rem;
+}
+
+.-mt-20 {
+    margin-top: -5rem;
+}
+
+.-mt-0\.5 {
+    margin-top: -0.125rem;
+}
+
+.mr-1 {
+    margin-right: 0.25rem;
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+.mr-3 {
+    margin-right: 0.75rem;
+}
+
+.mr-5 {
+    margin-right: 1.25rem;
+}
+
+.mb-3 {
+    margin-bottom: 0.75rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.ml-1 {
+    margin-left: 0.25rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.ml-3 {
+    margin-left: 0.75rem;
+}
+
+.ml-4 {
+    margin-left: 1rem;
+}
+
+.ml-1\.5 {
+    margin-left: 0.375rem;
+}
+
+.block {
+    display: block;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.flex {
+    display: flex;
+}
+
+.inline-flex {
+    display: inline-flex;
+}
+
+.table {
+    display: table;
+}
+
+.grid {
+    display: grid;
+}
+
+.contents {
+    display: contents;
+}
+
+.hidden {
+    display: none;
+}
+
+.h-4 {
+    height: 1rem;
+}
+
+.h-5 {
+    height: 1.25rem;
+}
+
+.h-6 {
+    height: 1.5rem;
+}
+
+.h-8 {
+    height: 2rem;
+}
+
+.h-16 {
+    height: 4rem;
+}
+
+.h-20 {
+    height: 5rem;
+}
+
+.h-36 {
+    height: 9rem;
+}
+
+.h-64 {
+    height: 16rem;
+}
+
+.h-auto {
+    height: auto;
+}
+
+.h-full {
+    height: 100%;
+}
+
+.h-screen {
+    height: 100vh;
+}
+
+.min-h-screen {
+    min-height: 100vh;
+}
+
+.w-4 {
+    width: 1rem;
+}
+
+.w-5 {
+    width: 1.25rem;
+}
+
+.w-6 {
+    width: 1.5rem;
+}
+
+.w-8 {
+    width: 2rem;
+}
+
+.w-12 {
+    width: 3rem;
+}
+
+.w-64 {
+    width: 16rem;
+}
+
+.w-1\/2 {
+    width: 50%;
+}
+
+.w-1\/4 {
+    width: 25%;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.max-w-xs {
+    max-width: 20rem;
+}
+
+.max-w-xl {
+    max-width: 36rem;
+}
+
+.max-w-2xl {
+    max-width: 42rem;
+}
+
+.flex-1 {
+    flex: 1 1 0%;
+}
+
+.flex-none {
+    flex: none;
+}
+
+.flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.border-collapse {
+    border-collapse: collapse;
+}
+
+.origin-top-right {
+    -webkit-transform-origin: top right;
+    transform-origin: top right;
+}
+
+.transform {
+    --tw-translate-x: 0;
+    --tw-translate-y: 0;
+    --tw-rotate: 0;
+    --tw-skew-x: 0;
+    --tw-skew-y: 0;
+    --tw-scale-x: 1;
+    --tw-scale-y: 1;
+    -webkit-transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.translate-x-4 {
+    --tw-translate-x: 1rem;
+}
+
+.-translate-x-1 {
+    --tw-translate-x: -0.25rem;
+}
+
+.translate-y-0 {
+    --tw-translate-y: 0px;
+}
+
+.translate-y-1 {
+    --tw-translate-y: 0.25rem;
+}
+
+.translate-y-4 {
+    --tw-translate-y: 1rem;
+}
+
+.translate-y-1\.5 {
+    --tw-translate-y: 0.375rem;
+}
+
+.-rotate-90 {
+    --tw-rotate: -90deg;
+}
+
+@-webkit-keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes ping {
+    75%, 100% {
+        -webkit-transform: scale(2);
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@keyframes ping {
+    75%, 100% {
+        -webkit-transform: scale(2);
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes pulse {
+    50% {
+        opacity: .5;
+    }
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .5;
+    }
+}
+
+@-webkit-keyframes bounce {
+    0%, 100% {
+        -webkit-transform: translateY(-25%);
+        transform: translateY(-25%);
+        -webkit-animation-timing-function: cubic-bezier(0.8,0,1,1);
+        animation-timing-function: cubic-bezier(0.8,0,1,1);
+    }
+
+    50% {
+        -webkit-transform: none;
+        transform: none;
+        -webkit-animation-timing-function: cubic-bezier(0,0,0.2,1);
+        animation-timing-function: cubic-bezier(0,0,0.2,1);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        -webkit-transform: translateY(-25%);
+        transform: translateY(-25%);
+        -webkit-animation-timing-function: cubic-bezier(0.8,0,1,1);
+        animation-timing-function: cubic-bezier(0.8,0,1,1);
+    }
+
+    50% {
+        -webkit-transform: none;
+        transform: none;
+        -webkit-animation-timing-function: cubic-bezier(0,0,0.2,1);
+        animation-timing-function: cubic-bezier(0,0,0.2,1);
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.list-disc {
+    list-style-type: disc;
+}
+
+.grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.content-center {
+    align-content: center;
+}
+
+.items-end {
+    align-items: flex-end;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.gap-4 {
+    gap: 1rem;
+}
+
+.gap-x-1 {
+    -webkit-column-gap: 0.25rem;
+    column-gap: 0.25rem;
+}
+
+.gap-x-4 {
+    -webkit-column-gap: 1rem;
+    column-gap: 1rem;
+}
+
+.gap-y-8 {
+    row-gap: 2rem;
+}
+
+.space-x-2 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.space-x-4 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(1rem * var(--tw-space-x-reverse));
+    margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.space-x-10 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(2.5rem * var(--tw-space-x-reverse));
+    margin-left: calc(2.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.space-y-8 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+}
+
+.overflow-auto {
+    overflow: auto;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.overflow-y-auto {
+    overflow-y: auto;
+}
+
+.overflow-x-hidden {
+    overflow-x: hidden;
+}
+
+.overflow-y-hidden {
+    overflow-y: hidden;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rounded-md {
+    border-radius: 0.375rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.rounded-full {
+    border-radius: 9999px;
+}
+
+.border-2 {
+    border-width: 2px;
+}
+
+.border {
+    border-width: 1px;
+}
+
+.border-t {
+    border-top-width: 1px;
+}
+
+.border-r {
+    border-right-width: 1px;
+}
+
+.border-b-2 {
+    border-bottom-width: 2px;
+}
+
+.border-b {
+    border-bottom-width: 1px;
+}
+
+.border-l-2 {
+    border-left-width: 2px;
+}
+
+.border-l-8 {
+    border-left-width: 8px;
+}
+
+.border-l {
+    border-left-width: 1px;
+}
+
+.border-transparent {
+    border-color: transparent;
+}
+
+.border-white {
+    --tw-border-opacity: 1;
+    border-color: rgba(255, 255, 255, var(--tw-border-opacity));
+}
+
+.border-gray-100 {
+    --tw-border-opacity: 1;
+    border-color: rgba(243, 244, 246, var(--tw-border-opacity));
+}
+
+.border-gray-200 {
+    --tw-border-opacity: 1;
+    border-color: rgba(229, 231, 235, var(--tw-border-opacity));
+}
+
+.border-gray-300 {
+    --tw-border-opacity: 1;
+    border-color: rgba(209, 213, 219, var(--tw-border-opacity));
+}
+
+.border-gray-700 {
+    --tw-border-opacity: 1;
+    border-color: rgba(55, 65, 81, var(--tw-border-opacity));
+}
+
+.border-gray-800 {
+    --tw-border-opacity: 1;
+    border-color: rgba(31, 41, 55, var(--tw-border-opacity));
+}
+
+.border-yellow-400 {
+    --tw-border-opacity: 1;
+    border-color: rgba(251, 191, 36, var(--tw-border-opacity));
+}
+
+.border-green-400 {
+    --tw-border-opacity: 1;
+    border-color: rgba(52, 211, 153, var(--tw-border-opacity));
+}
+
+.border-pink-300 {
+    --tw-border-opacity: 1;
+    border-color: rgba(249, 168, 212, var(--tw-border-opacity));
+}
+
+.border-pink-500 {
+    --tw-border-opacity: 1;
+    border-color: rgba(236, 72, 153, var(--tw-border-opacity));
+}
+
+.hover\:border-pink-500:hover {
+    --tw-border-opacity: 1;
+    border-color: rgba(236, 72, 153, var(--tw-border-opacity));
+}
+
+.focus\:border-indigo-700:focus {
+    --tw-border-opacity: 1;
+    border-color: rgba(67, 56, 202, var(--tw-border-opacity));
+}
+
+.focus\:border-pink-500:focus {
+    --tw-border-opacity: 1;
+    border-color: rgba(236, 72, 153, var(--tw-border-opacity));
+}
+
+.bg-white {
+    --tw-bg-opacity: 1;
+    background-color: rgba(255, 255, 255, var(--tw-bg-opacity));
+}
+
+.bg-gray-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(243, 244, 246, var(--tw-bg-opacity));
+}
+
+.bg-gray-200 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(229, 231, 235, var(--tw-bg-opacity));
+}
+
+.bg-gray-300 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(209, 213, 219, var(--tw-bg-opacity));
+}
+
+.bg-gray-400 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(156, 163, 175, var(--tw-bg-opacity));
+}
+
+.bg-gray-800 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(31, 41, 55, var(--tw-bg-opacity));
+}
+
+.bg-red-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(254, 226, 226, var(--tw-bg-opacity));
+}
+
+.bg-red-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(239, 68, 68, var(--tw-bg-opacity));
+}
+
+.bg-yellow-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(254, 243, 199, var(--tw-bg-opacity));
+}
+
+.bg-blue-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(219, 234, 254, var(--tw-bg-opacity));
+}
+
+.bg-pink-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(236, 72, 153, var(--tw-bg-opacity));
+}
+
+.bg-pink-600 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(219, 39, 119, var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-50:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgba(249, 250, 251, var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-900:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgba(17, 24, 39, var(--tw-bg-opacity));
+}
+
+.hover\:bg-pink-700:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgba(190, 24, 93, var(--tw-bg-opacity));
+}
+
+.bg-opacity-75 {
+    --tw-bg-opacity: 0.75;
+}
+
+.bg-gradient-to-t {
+    background-image: linear-gradient(to top, var(--tw-gradient-stops));
+}
+
+.from-white {
+    --tw-gradient-from: #fff;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255, 255, 255, 0));
+}
+
+.p-1 {
+    padding: 0.25rem;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.p-4 {
+    padding: 1rem;
+}
+
+.px-0 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.px-1 {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+.px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.px-7 {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+}
+
+.px-0\.5 {
+    padding-left: 0.125rem;
+    padding-right: 0.125rem;
+}
+
+.px-1\.5 {
+    padding-left: 0.375rem;
+    padding-right: 0.375rem;
+}
+
+.py-0 {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.py-1 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.py-5 {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+}
+
+.py-10 {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+}
+
+.py-0\.5 {
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+}
+
+.pt-1 {
+    padding-top: 0.25rem;
+}
+
+.pt-4 {
+    padding-top: 1rem;
+}
+
+.pt-5 {
+    padding-top: 1.25rem;
+}
+
+.pb-4 {
+    padding-bottom: 1rem;
+}
+
+.pb-6 {
+    padding-bottom: 1.5rem;
+}
+
+.pb-20 {
+    padding-bottom: 5rem;
+}
+
+.pl-3 {
+    padding-left: 0.75rem;
+}
+
+.pl-6 {
+    padding-left: 1.5rem;
+}
+
+.pl-7 {
+    padding-left: 1.75rem;
+}
+
+.pl-8 {
+    padding-left: 2rem;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.align-bottom {
+    vertical-align: bottom;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.font-light {
+    font-weight: 300;
+}
+
+.font-normal {
+    font-weight: 400;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.leading-5 {
+    line-height: 1.25rem;
+}
+
+.leading-6 {
+    line-height: 1.5rem;
+}
+
+.tracking-wider {
+    letter-spacing: 0.05em;
+}
+
+.tracking-widest {
+    letter-spacing: 0.1em;
+}
+
+.text-white {
+    --tw-text-opacity: 1;
+    color: rgba(255, 255, 255, var(--tw-text-opacity));
+}
+
+.text-gray-200 {
+    --tw-text-opacity: 1;
+    color: rgba(229, 231, 235, var(--tw-text-opacity));
+}
+
+.text-gray-400 {
+    --tw-text-opacity: 1;
+    color: rgba(156, 163, 175, var(--tw-text-opacity));
+}
+
+.text-gray-500 {
+    --tw-text-opacity: 1;
+    color: rgba(107, 114, 128, var(--tw-text-opacity));
+}
+
+.text-gray-600 {
+    --tw-text-opacity: 1;
+    color: rgba(75, 85, 99, var(--tw-text-opacity));
+}
+
+.text-gray-700 {
+    --tw-text-opacity: 1;
+    color: rgba(55, 65, 81, var(--tw-text-opacity));
+}
+
+.text-gray-800 {
+    --tw-text-opacity: 1;
+    color: rgba(31, 41, 55, var(--tw-text-opacity));
+}
+
+.text-gray-900 {
+    --tw-text-opacity: 1;
+    color: rgba(17, 24, 39, var(--tw-text-opacity));
+}
+
+.text-red-400 {
+    --tw-text-opacity: 1;
+    color: rgba(248, 113, 113, var(--tw-text-opacity));
+}
+
+.text-red-500 {
+    --tw-text-opacity: 1;
+    color: rgba(239, 68, 68, var(--tw-text-opacity));
+}
+
+.text-yellow-500 {
+    --tw-text-opacity: 1;
+    color: rgba(245, 158, 11, var(--tw-text-opacity));
+}
+
+.text-yellow-800 {
+    --tw-text-opacity: 1;
+    color: rgba(146, 64, 14, var(--tw-text-opacity));
+}
+
+.text-green-500 {
+    --tw-text-opacity: 1;
+    color: rgba(16, 185, 129, var(--tw-text-opacity));
+}
+
+.text-green-600 {
+    --tw-text-opacity: 1;
+    color: rgba(5, 150, 105, var(--tw-text-opacity));
+}
+
+.text-blue-400 {
+    --tw-text-opacity: 1;
+    color: rgba(96, 165, 250, var(--tw-text-opacity));
+}
+
+.text-blue-500 {
+    --tw-text-opacity: 1;
+    color: rgba(59, 130, 246, var(--tw-text-opacity));
+}
+
+.text-blue-800 {
+    --tw-text-opacity: 1;
+    color: rgba(30, 64, 175, var(--tw-text-opacity));
+}
+
+.text-pink-500 {
+    --tw-text-opacity: 1;
+    color: rgba(236, 72, 153, var(--tw-text-opacity));
+}
+
+.text-pink-600 {
+    --tw-text-opacity: 1;
+    color: rgba(219, 39, 119, var(--tw-text-opacity));
+}
+
+.text-teal-500 {
+    --tw-text-opacity: 1;
+    color: rgba(56, 178, 172, var(--tw-text-opacity));
+}
+
+.group:hover .group-hover\:text-gray-900 {
+    --tw-text-opacity: 1;
+    color: rgba(17, 24, 39, var(--tw-text-opacity));
+}
+
+.group:hover .group-hover\:text-pink-600 {
+    --tw-text-opacity: 1;
+    color: rgba(219, 39, 119, var(--tw-text-opacity));
+}
+
+.hover\:text-white:hover {
+    --tw-text-opacity: 1;
+    color: rgba(255, 255, 255, var(--tw-text-opacity));
+}
+
+.hover\:text-gray-500:hover {
+    --tw-text-opacity: 1;
+    color: rgba(107, 114, 128, var(--tw-text-opacity));
+}
+
+.hover\:text-gray-700:hover {
+    --tw-text-opacity: 1;
+    color: rgba(55, 65, 81, var(--tw-text-opacity));
+}
+
+.hover\:text-pink-500:hover {
+    --tw-text-opacity: 1;
+    color: rgba(236, 72, 153, var(--tw-text-opacity));
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.opacity-0 {
+    opacity: 0;
+}
+
+.opacity-10 {
+    opacity: 0.1;
+}
+
+.opacity-25 {
+    opacity: 0.25;
+}
+
+.opacity-75 {
+    opacity: 0.75;
+}
+
+.opacity-100 {
+    opacity: 1;
+}
+
+.hover\:opacity-100:hover {
+    opacity: 1;
+}
+
+*, ::before, ::after {
+    --tw-shadow: 0 0 #0000;
+}
+
+.shadow-sm {
+    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.shadow {
+    --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.shadow-md {
+    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.shadow-lg {
+    --tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.shadow-xl {
+    --tw-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.shadow-inner {
+    --tw-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.focus\:outline-none:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+*, ::before, ::after {
+    --tw-ring-inset: var(--tw-empty,/*!*/ /*!*/);
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-color: rgba(59, 130, 246, 0.5);
+    --tw-ring-offset-shadow: 0 0 #0000;
+    --tw-ring-shadow: 0 0 #0000;
+}
+
+.focus\:ring-2:focus {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus\:ring-pink-500:focus {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgba(236, 72, 153, var(--tw-ring-opacity));
+}
+
+.focus\:ring-offset-2:focus {
+    --tw-ring-offset-width: 2px;
+}
+
+.filter {
+    --tw-blur: var(--tw-empty,/*!*/ /*!*/);
+    --tw-brightness: var(--tw-empty,/*!*/ /*!*/);
+    --tw-contrast: var(--tw-empty,/*!*/ /*!*/);
+    --tw-grayscale: var(--tw-empty,/*!*/ /*!*/);
+    --tw-hue-rotate: var(--tw-empty,/*!*/ /*!*/);
+    --tw-invert: var(--tw-empty,/*!*/ /*!*/);
+    --tw-saturate: var(--tw-empty,/*!*/ /*!*/);
+    --tw-sepia: var(--tw-empty,/*!*/ /*!*/);
+    --tw-drop-shadow: var(--tw-empty,/*!*/ /*!*/);
+    -webkit-filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.transition {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, -webkit-transform, -webkit-filter, -webkit-backdrop-filter;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-transform, -webkit-filter, -webkit-backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.transition-colors {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.transition-opacity {
+    transition-property: opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.duration-150 {
+    transition-duration: 150ms;
+}
+
+.duration-200 {
+    transition-duration: 200ms;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+.ease-in {
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.ease-out {
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.ease-in-out {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 640px) {
+    .sm\:col-span-1 {
+        grid-column: span 1 / span 1;
+    }
+
+    .sm\:col-start-1 {
+        grid-column-start: 1;
+    }
+
+    .sm\:col-start-2 {
+        grid-column-start: 2;
+    }
+
+    .sm\:my-8 {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .sm\:mt-0 {
+        margin-top: 0px;
+    }
+
+    .sm\:mt-6 {
+        margin-top: 1.5rem;
+    }
+
+    .sm\:block {
+        display: block;
+    }
+
+    .sm\:inline-block {
+        display: inline-block;
+    }
+
+    .sm\:grid {
+        display: grid;
+    }
+
+    .sm\:h-screen {
+        height: 100vh;
+    }
+
+    .sm\:w-full {
+        width: 100%;
+    }
+
+    .sm\:max-w-2xl {
+        max-width: 42rem;
+    }
+
+    .sm\:max-w-6xl {
+        max-width: 72rem;
+    }
+
+    .sm\:translate-y-0 {
+        --tw-translate-y: 0px;
+    }
+
+    .sm\:scale-95 {
+        --tw-scale-x: .95;
+        --tw-scale-y: .95;
+    }
+
+    .sm\:scale-100 {
+        --tw-scale-x: 1;
+        --tw-scale-y: 1;
+    }
+
+    .sm\:grid-flow-row-dense {
+        grid-auto-flow: row dense;
+    }
+
+    .sm\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sm\:gap-3 {
+        gap: 0.75rem;
+    }
+
+    .sm\:rounded-lg {
+        border-radius: 0.5rem;
+    }
+
+    .sm\:p-0 {
+        padding: 0px;
+    }
+
+    .sm\:p-6 {
+        padding: 1.5rem;
+    }
+
+    .sm\:px-6 {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .sm\:align-middle {
+        vertical-align: middle;
+    }
+
+    .sm\:text-sm {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+}
+
+@media (min-width: 768px) {
+}
+
+@media (min-width: 1024px) {
+}
+
+@media (min-width: 1280px) {
+}
+
+@media (min-width: 1536px) {
+}
+/*purgecss start ignore */
+
+/** Preloader */
+
+#preloader {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: #1f2937;
+    color: #ffffff;
+    transition: .3s all ease;
+}
+
+#preloader.loaded {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.rotating-wheel {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto;
+    border: 3px solid #ec4899;
+    border-radius: 50%;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+    -webkit-animation: rotating-spin .88s infinite linear;
+    animation: rotating-spin .88s infinite linear;
+}
+
+@-webkit-keyframes rotating-spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rotating-spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+/** Resizer */
+
+.Resizer {
+    background: #374251;
+    z-index: 1;
+    box-sizing: border-box;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding;
+    background-clip: padding-box;
+}
+
+.Resizer:hover {
+    transition: all 2s ease;
+}
+
+.Resizer.horizontal {
+    height: 11px;
+    margin: -5px 0;
+    border-top: 5px solid rgba(255, 255, 255, 0);
+    border-bottom: 5px solid rgba(255, 255, 255, 0);
+    cursor: row-resize;
+    width: 100%;
+}
+
+.Resizer.horizontal:hover {
+    border-top: 5px solid rgba(0, 0, 0, 0.5);
+    border-bottom: 5px solid rgba(0, 0, 0, 0.5);
+}
+
+.Resizer.vertical {
+    width: 11px;
+    margin: 0 -5px;
+    border-left: 5px solid rgba(255, 255, 255, 0);
+    border-right: 5px solid rgba(255, 255, 255, 0);
+    cursor: col-resize;
+}
+
+.Resizer.vertical:hover {
+    border-left: 5px solid rgba(0, 0, 0, 0.5);
+    border-right: 5px solid rgba(0, 0, 0, 0.5);
+}
+
+.Resizer.disabled {
+    cursor: not-allowed;
+}
+
+.Resizer.disabled:hover {
+    border-color: transparent;
+}
+
+/*purgecss end ignore */
+
+/*# sourceMappingURL=main.a1680b17.css.map*/

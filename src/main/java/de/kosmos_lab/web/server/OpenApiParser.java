@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import de.kosmos_lab.utils.KosmosFileUtils;
 import de.kosmos_lab.web.annotations.ExternalDocumentation;
 import de.kosmos_lab.web.annotations.Operation;
 import de.kosmos_lab.web.annotations.Parameter;
@@ -46,17 +47,11 @@ import org.json.JSONObject;
 import org.reflections.Reflections;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +63,7 @@ public class OpenApiParser {
     protected final WebServer server;
     private final String formatRegex = "%\\{(?<key>.*?)\\}";
     private final Pattern formatPattern = Pattern.compile(".*?(" + formatRegex + ").*+");
+    JSONObject injectedExamples = null;
     private JSONObject json = null;
     private HashSet<Schema> schemas = new HashSet<>();
     private HashSet<ObjectSchema> oschemas = new HashSet<>();
@@ -76,12 +72,23 @@ public class OpenApiParser {
     private HashSet<Tag> tags = new HashSet<>();
     private ResourceBundle labels = null;
     private HashMap<String, JSONObject> mResponses = new HashMap<>();
-    private JSONObject components = new JSONObject();;
+    ;
+    private JSONObject components = new JSONObject();
     private LinkedList<Example> examples = new LinkedList<>();
     private JSONObject responses = new JSONObject();
+    private String cachedJSON = null;
+    private String cachedYAML = null;
 
     public OpenApiParser(WebServer server) {
         this.server = server;
+        File exampleFile = new File("config/examples-openapi.json");
+        if (exampleFile.exists()) {
+            try {
+                this.injectedExamples = new JSONObject(KosmosFileUtils.readFile(exampleFile));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     public static OpenApiParser getInstance(WebServer server) {
@@ -102,12 +109,6 @@ public class OpenApiParser {
         String jsonAsYaml = new YAMLMapper().writeValueAsString(jsonNodeTree);
         return jsonAsYaml;
     }
-
-
-    public synchronized String getYAML() throws IOException {
-        return asYaml(getJSON().toString());
-    }
-
 
     public JSONObject toJSON(AsyncInfo info) {
         JSONObject jinfo = new JSONObject();
@@ -207,7 +208,7 @@ public class OpenApiParser {
 
             for (Class<?> c : r.getTypesAnnotatedWith(Server.class)) {
                 for (Server s : c.getAnnotationsByType(Server.class)) {
-                    logger.info("found server {}", s);
+                    //logger.info("found server {}", s);
                     JSONObject j = new JSONObject();
                     add("description", s.description(), j);
                     add("url", s.url(), j);
@@ -259,7 +260,7 @@ public class OpenApiParser {
 
 
         for (Server s : server.getClass().getAnnotationsByType(Server.class)) {
-            logger.info("found server {}", s);
+            //logger.info("found server {}", s);
             JSONObject j = new JSONObject();
             add("description", s.description(), j);
             add("url", s.url(), j);
@@ -297,7 +298,7 @@ public class OpenApiParser {
             ApiEndpoint a = c.getAnnotation(ApiEndpoint.class);
             if (a != null) {
                 if (!a.hidden()) {
-                    logger.info("found {}", a);
+                    //logger.info("found {}", a);
                     for (Method m : c.getDeclaredMethods()) {
                         for (String method : new String[]{"get", "post", "delete"}) {
                             try {
@@ -389,11 +390,10 @@ public class OpenApiParser {
 
     public JSONObject toJSON(ObjectSchema p) {
         JSONObject pjson = toJSON(p.properties());
-        if ( p.additionalProperties() == AdditionalProperties.TRUE) {
-            pjson.put("additionalProperties",true);
-        }
-        else if( p.additionalProperties() == AdditionalProperties.FALSE) {
-            pjson.put("additionalProperties",false);
+        if (p.additionalProperties() == AdditionalProperties.TRUE) {
+            pjson.put("additionalProperties", true);
+        } else if (p.additionalProperties() == AdditionalProperties.FALSE) {
+            pjson.put("additionalProperties", false);
         }
         JSONArray ex = new JSONArray();
         for (ExampleObject e : p.examples()) {
@@ -422,9 +422,9 @@ public class OpenApiParser {
             if (!checkExample(ex.value, createJSONSchemaFromSchema(ex.schema), ex.type)) {
                 logger.error("Example failed! {} {}", ex.schema, ex.value);
                 failed++;
-            } else {
+            }/* else {
                 logger.info("Example did pass! {} {}", ex.schema, ex.value);
-            }
+            }*/
             checked++;
         }
         if (failed > 0) {
@@ -534,7 +534,7 @@ public class OpenApiParser {
         }
         try {
             for (Class<?> ex : method.getExceptionTypes()) {
-                logger.info("{} throws exception {}:", endpoint.path(), ex.getSimpleName());
+                //logger.info("{} throws exception {}:", endpoint.path(), ex.getSimpleName());
                 String n = ex.getSimpleName().replace("Exception", "Error");
                 addException(n, ex, resp);
 
@@ -543,14 +543,7 @@ public class OpenApiParser {
         } catch (Exception e) {
 
         }
-        if (endpoint.userLevel() != -1) {
-            /*if (!resp.has(String.valueOf(WebServer.STATUS_NO_AUTH))) {
-                resp.put(String.valueOf(WebServer.STATUS_NO_AUTH), new JSONObject().put("$ref", "#/components/responses/NoAuthError"));
-            }*/
-            /*if (!resp.has(String.valueOf(KosmoSServlet.STATUS_FORBIDDEN))) {
-                resp.put(String.valueOf(KosmoSServlet.STATUS_FORBIDDEN), new JSONObject().put("$ref", "#/components/responses/NoAuthError"));
-            }*/
-        }
+
         j.put("responses", resp);
         JSONArray params = new JSONArray();
 
@@ -563,10 +556,168 @@ public class OpenApiParser {
         if (params.length() > 0) {
             j.put("parameters", params);
         }
+        injectExamples(operation,operationId);
         JSONObject requestBody = new JSONObject();
         add("content", operation.requestBody().content(), requestBody);
         if (requestBody.length() > 0) {
+
             j.put("requestBody", requestBody);
+
+        }
+        //injectExamples(operationId, j);
+
+    }
+    ExampleObject getExample(final String name,final String value)
+    {
+        //logger.info ("creating example for {}: {}",name,value);
+        ExampleObject annotation = new ExampleObject()
+        {
+            @Override
+            public String name()
+            {
+                return name;
+            }
+
+            @Override
+            public String summary() {
+                return null;
+            }
+
+            @Override
+            public String value()
+            {
+                return value;
+            }
+
+            @Override
+            public String externalValue() {
+                return "";
+            }
+
+            @Override
+            public String ref() {
+                return "";
+            }
+
+            @Override
+            public String description() {
+                return "";
+            }
+
+            @Override
+            public Class<? extends ExampleObject> annotationType()
+            {
+                return ExampleObject.class;
+            }
+        };
+
+        return annotation;
+    }
+    HashMap<Content,ExampleObject[]> contentExamples = new HashMap<>();
+    private void injectExamples(Operation operation, String operationId) {
+        if (injectedExamples != null) {
+            try {
+                if (injectedExamples.has(operationId)) {
+                    //logger.info("has operationId {}",operationId);
+                    JSONObject inject = injectedExamples.getJSONObject(operationId);
+                    if (inject.has("requestBody")) {
+                        JSONObject irb = inject.getJSONObject("requestBody");
+
+                        for (Content c : operation.requestBody().content()) {
+                            if (irb.has(c.mediaType())) {
+                                //logger.info("has content for  {}",c.mediaType());
+                                ArrayList<ExampleObject> list = new ArrayList<>();
+                                for ( ExampleObject e : c.examples()) {
+                                    list.add(e);
+                                }
+                                JSONObject ex = irb.getJSONObject(c.mediaType());
+                                for ( String key : ex.keySet()) {
+                                    //logger.info("found example {}",key);
+                                    list.add( getExample(key,String.valueOf(ex.get(key))));
+                                }
+                                ExampleObject[] array = new ExampleObject[list.size()];
+                                list.toArray(array);
+                                contentExamples.put(c,array);
+                            }
+                        }
+                    }
+
+
+
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+        }
+    }
+    /**
+     * inject examples into operationJSON
+     *
+     * @deprecated - old experimental way to add the examples
+     */
+    @Deprecated
+    private void injectExamples(String operationId, JSONObject json) {
+        if (injectedExamples != null) {
+            try {
+                if (injectedExamples.has(operationId)) {
+
+                    JSONObject inject = injectedExamples.getJSONObject(operationId);
+                    if (inject.has("requestBody") && json.has("requestBody")) {
+                        JSONObject irb = inject.getJSONObject("requestBody");
+                        JSONObject jrb = json.getJSONObject("requestBody");
+                        if (jrb.has("content")) {
+                            JSONObject jc = jrb.getJSONObject("content");
+
+                            SortedSet<String> keyList = new TreeSet<>();
+                            for ( String key : jc.keySet()) {
+                                keyList.add(key);
+                            }
+                            for (String type : keyList) {
+                                if (irb.has(type)) {
+                                    JSONObject jct = jc.getJSONObject(type);
+                                    JSONObject jex = null;
+                                    if ( jct.has("examples")) {
+                                        jex = jct.getJSONObject("examples");
+                                    }
+                                    else {
+                                        jex = new JSONObject();
+                                        jct.put("examples",jex);
+                                    }
+
+
+
+                                    JSONObject iex = irb.getJSONObject(type);
+                                    for (String exKey : iex.keySet()) {
+                                        Object exx = iex.get(exKey);
+                                        if ( exx instanceof  JSONObject) {
+                                            //check if there is only 1 entry named value
+                                            if (((JSONObject) exx).keySet().size()==1 && ((JSONObject) exx).has("value") ) {
+                                                //just add it the way it is
+                                                jex.put(exKey,exx);
+                                            }
+                                            else {
+                                                //add a layer for "value", because the specification needs that layer
+                                                jex.put(exKey,new JSONObject().put("value",exx));
+                                            }
+                                        }
+                                        else {
+                                            jex.put(exKey,new JSONObject().put("value",exx));
+                                        }
+
+                                    }
+                                    //jex.put
+                                }
+                            }
+
+                        }
+
+                    }
+
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
 
@@ -575,7 +726,7 @@ public class OpenApiParser {
     protected void addException(String n, Class<?> ex, JSONObject resp) {
         ApiResponse apiresp = ex.getAnnotation(ApiResponse.class);
         if (apiresp != null) {
-            logger.info("Found ApiResponse for {} {}", ex.getSimpleName(), apiresp);
+            //logger.info("Found ApiResponse for {} {}", ex.getSimpleName(), apiresp);
             if (apiresp.componentName().length() > 0) {
                 n = apiresp.componentName();
             }
@@ -600,8 +751,8 @@ public class OpenApiParser {
             }
 
         } else {
-            if (ex.getSuperclass() != null) {
-                logger.info("Found NO ApiResponse for {} - now looking for {}", ex.getSimpleName(), ex.getSuperclass());
+            if (ex.getSuperclass() != null && ex.getSuperclass() != java.lang.Exception.class  ) {
+                logger.info("Found NO ApiResponse for {} - now looking for {}", ex.getCanonicalName(), ex.getSuperclass());
                 addException(n, ex.getSuperclass(), resp);
             } else {
                 logger.info("Found NO ApiResponse for {} - {}", ex.getSimpleName(), ex.getCanonicalName());
@@ -760,6 +911,7 @@ public class OpenApiParser {
         return ex;
 
     }
+
     public JSONArray getExamplesArray(ExampleObject[] examples) {
         LinkedList<ExampleObject> ex = new LinkedList<>();
 
@@ -795,6 +947,7 @@ public class OpenApiParser {
         return ex;
 
     }
+
     public JSONObject toJSON(Parameter p) {
         JSONObject pjson = new JSONObject();
         if (p.ref().length() > 0) {
@@ -955,9 +1108,18 @@ public class OpenApiParser {
                         }
 
                     }
+                    ExampleObject[] cExamples = contentExamples.get(c);
+                    if (cExamples == null) {
 
-                    if (c.examples().length > 0) {
-                        add("examples", c.examples(), cjson);
+                        cExamples = c.examples();
+                    }
+                    if (cExamples.length > 0) {
+                        try {
+                            add("examples", cExamples, cjson);
+                        } catch (Exception e) {
+                            //throw new RuntimeException(e);
+                            logger.error("COULD NOT PARSE EXAMPLES! {}",cExamples, e);
+                        }
 
                     }
                     if (cjson.length() > 0) {
@@ -965,9 +1127,9 @@ public class OpenApiParser {
                     }
                     JSONObject j = null;
                     try {
-                        if (c.examples().length > 0) {
+                        if (cExamples.length > 0) {
                             if (cjson.has("schema")) {
-                                for (ExampleObject e : c.examples()) {
+                                for (ExampleObject e : cExamples) {
                                     String v = e.value();
                                     if (v.length() == 0) {
                                         v = e.name();
@@ -1034,7 +1196,9 @@ public class OpenApiParser {
         } else {
             add("summary", example.summary(), json);
             add("description", example.description(), json);
+
             add("value", example.value(), json, true);
+
 
             if (!json.has("value")) {
                 add("value", example.value(), json);
@@ -1042,7 +1206,7 @@ public class OpenApiParser {
             if (!json.has("value")) {
                 add("value", example.name(), json);
             }
-
+            //logger.info("{} added value {} as {} [{}]",example.name(),example.value(),json.opt("value"),json.opt("value").getClass());
             add("externalValue", example.externalValue(), json);
         }
 
@@ -1249,7 +1413,6 @@ public class OpenApiParser {
         }
     }
 
-
     public void add(String tag, ExternalDocumentation value, JSONObject json) {
         JSONObject j = new JSONObject();
         if (value.url().length() > 0) {
@@ -1366,7 +1529,7 @@ public class OpenApiParser {
                 return new JSONObject(value);
 
             } catch (Exception ex) {
-
+                ex.printStackTrace();
             }
         }
         if (value.startsWith("[")) {
@@ -1386,7 +1549,9 @@ public class OpenApiParser {
             if (parseValue) {
                 json.put(tag, parseValue(value));
             }
-            json.put(tag, prepareString(value));
+            else {
+                json.put(tag, prepareString(value));
+            }
         }
 
     }
@@ -1402,7 +1567,27 @@ public class OpenApiParser {
 
     }
 
+    public synchronized String getYAML() throws IOException {
+        return asYaml(getCachedJSON());
+    }
 
+    public synchronized String getCachedJSON() {
+        if (this.cachedJSON == null) {
+            this.cachedJSON = this.getJSON().toString(2);
+        }
+        return this.cachedJSON;
+    }
+
+    public synchronized String getCachedYAML() {
+        if (this.cachedYAML == null) {
+            try {
+                this.cachedYAML = this.getYAML();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return this.cachedYAML;
+    }
 }
 
 class Example {
