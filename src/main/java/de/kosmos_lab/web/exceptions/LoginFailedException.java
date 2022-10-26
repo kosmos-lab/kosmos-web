@@ -10,4 +10,8 @@ public class LoginFailedException extends UnauthorizedException {
     public LoginFailedException() {
         super(LoginFailedException.class.getAnnotation(ApiResponse.class).description());
     }
+    public LoginFailedException(String message) {
+        super(message);
+    }
+
 }

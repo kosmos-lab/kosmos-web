@@ -20,7 +20,7 @@ public class JWT {
         NONE,
         HS256
     }
-    public static final long DEFAULT_LIFETIME = 3600000l;
+    public static final long DEFAULT_LIFETIME = 86400000l;
     Algorithm algorithm;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger("JWT");
     

@@ -1,10 +1,14 @@
 package de.kosmos_lab.web.client.websocket;
 
 import de.kosmos_lab.utils.JSONChecker;
+import jakarta.websocket.ClientEndpoint;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
-import jakarta.websocket.MessageHandler;
+import jakarta.websocket.MessageHandler.Whole;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
@@ -12,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
-
-public class WebSocketClientEndpoint extends Endpoint {
+@ClientEndpoint
+public abstract class WebSocketClientEndpoint {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger("WebSocketClientEndpoint");
     protected final WebSocketClient client;
     public CountDownLatch initLatch;
@@ -49,38 +53,17 @@ public class WebSocketClientEndpoint extends Endpoint {
         return this.authed;
     }
     
-    @Override
-    public void onClose(Session session, CloseReason closeReason) {
-        super.onClose(session, closeReason);
-        logger.info("WS onClose");
-        //this.stopped = false;
-    }
-    
-    public void onMessageReceived(String message) {
-        logger.info("wsreceived: {}",message);
 
-    }
 
-    
-    @Override
-    public void onOpen(Session session, EndpointConfig endpointConfig) {
+    @OnClose
+    public abstract void wsOnClose(Session session, CloseReason closeReason);
+    @OnOpen
+    public abstract void wsOnOpen(Session session);
+    @OnMessage
+    public abstract void wsOnMessage(Session session,String message);
 
-        try {
-            logger.info("WSClient onOpen");
-            this.session = session;
-            
-            session.addMessageHandler(new MessageHandler.Whole<String>() {
-                
-                @Override
-                public void onMessage(String message) {
-                    onMessageReceived(message);
-                    
-                }
-            });
-        } catch (Exception e) {
-            logger.error("Exception!", e);
-        }
-    }
+
+
     
     
     /**

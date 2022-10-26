@@ -1,4 +1,9 @@
 # Changelog
+## v0.1.3.7
+* minor changes in clients
+* new flows for websockets
+* changed index.html a bit
+
 ## v0.1.3.6
 * updated some dependencies
 * removed netty core dependency
