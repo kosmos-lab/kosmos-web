@@ -44,11 +44,11 @@
         <!--<jettyVersion>9.4.32.v20200930</jettyVersion>-->
         <finalName>web</finalName>
         <jettyVersion>11.0.15</jettyVersion>
-        <spotbugsVersion>4.7.1</spotbugsVersion>
+        <spotbugsVersion>4.7.3</spotbugsVersion>
         <pf4jVersion>3.6.0</pf4jVersion>
         <testngVersion>6.8</testngVersion>
-        <jsonschemaVersion>1.14.1</jsonschemaVersion>
-        <logbackVersion>1.4.0</logbackVersion>
+        <jsonschemaVersion>1.14.2</jsonschemaVersion>
+        <logbackVersion>1.4.8</logbackVersion>
         <reflectionsVersion>0.9.12</reflectionsVersion>
 
     </properties>
@@ -180,7 +180,7 @@
         <dependency>
             <groupId>org.glassfish.tyrus.bundles</groupId>
             <artifactId>tyrus-standalone-client</artifactId>
-            <version>2.0.0-M3</version>
+            <version>2.1.3</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.reflections/reflections -->
@@ -295,7 +295,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>2.13.0</version>
         </dependency>
     </dependencies>
     <build>
